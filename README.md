@@ -4,6 +4,10 @@
 
 **Your messages stay on your Mac.** BumpReplies has no backend, networking, telemetry, or analytics.
 
+![Illustrative BumpReplies menu-bar popover with fictional data](docs/images/bumpreplies-mockup.png)
+
+*Illustrative mockup using fictional names and conversation metadata only.*
+
 | Follow up with confidence | Keep your queue tidy | Stay private |
 | --- | --- | --- |
 | Finds conversations waiting on someone else | Dismiss a message or ignore a conversation | Reads Messages locally and in read-only mode |
