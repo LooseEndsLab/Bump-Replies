@@ -124,7 +124,7 @@ private struct SlidingChoiceToggle<Value: Hashable>: View {
 
                 ZStack(alignment: isFirstSelected ? .leading : .trailing) {
                     RoundedRectangle(cornerRadius: 7, style: .continuous)
-                        .fill(Color(nsColor: .separatorColor).opacity(0.12))
+                        .fill(Color(nsColor: .tertiaryLabelColor).opacity(0.20))
                         .overlay {
                             RoundedRectangle(cornerRadius: 7, style: .continuous)
                                 .stroke(Color(nsColor: .separatorColor).opacity(0.65), lineWidth: 1)
