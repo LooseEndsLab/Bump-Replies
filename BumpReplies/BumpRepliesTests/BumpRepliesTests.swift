@@ -15,9 +15,13 @@ struct BumpRepliesTests {
     private let now = Date(timeIntervalSinceReferenceDate: 800_000_000)
     private func message(daysAgo: Int, fromMe: Bool = true, chatID: Int64 = 1, messageID: Int64 = 10) -> ConversationMessage { ConversationMessage(chatID: chatID, chatIdentifier: "test", displayName: "Test", messageID: messageID, date: Calendar.current.date(byAdding: .day, value: -daysAgo, to: now)!, isFromMe: fromMe, isGroupChat: false) }
     private func results(_ messages: [ConversationMessage], threshold: Int = 7, ignored: Set<Int64> = [], dismissed: Set<Int64> = []) throws -> [FollowUp] { try FollowUpChecker(store: StubStore(messages)).findFollowUps(thresholdDays: threshold, ignoredChatIDs: ignored, dismissedMessageIDs: dismissed, ignoreGroupChats: true, now: now) }
+    private func ghostedResults(_ messages: [ConversationMessage], threshold: Int = 7, ignored: Set<Int64> = [], dismissed: Set<Int64> = []) throws -> [FollowUp] { try FollowUpChecker(store: StubStore(messages)).findGhostedConversations(thresholdDays: threshold, ignoredChatIDs: ignored, dismissedMessageIDs: dismissed, ignoreGroupChats: true, now: now) }
     @Test func outgoingOlderThanThresholdIsFollowUp() throws { #expect(try results([message(daysAgo: 7)]).count == 1) }
     @Test func newerOutgoingIsNotFollowUp() throws { #expect(try results([message(daysAgo: 6)]).isEmpty) }
     @Test func incomingLatestIsNotFollowUp() throws { #expect(try results([message(daysAgo: 20, fromMe: false)]).isEmpty) }
+    @Test func oldIncomingMessageIsGhostedConversation() throws { #expect(try ghostedResults([message(daysAgo: 20, fromMe: false)]).count == 1) }
+    @Test func oldOutgoingMessageIsNotGhostedConversation() throws { #expect(try ghostedResults([message(daysAgo: 20)]).isEmpty) }
+    @Test func conversationOlderThanMaximumAgeIsIgnored() throws { #expect(try FollowUpChecker(store: StubStore([message(daysAgo: 91)])).findFollowUps(thresholdDays: 7, maximumAgeDays: 90, ignoredChatIDs: [], dismissedMessageIDs: [], ignoreGroupChats: true, now: now).isEmpty) }
     @Test func dismissedMessageIsNotFollowUp() throws { #expect(try results([message(daysAgo: 20)], dismissed: [10]).isEmpty) }
     @Test func ignoredConversationIsNotFollowUp() throws { #expect(try results([message(daysAgo: 20)], ignored: [1]).isEmpty) }
     @Test func notificationIsOnlyAllowedOncePerMessage() { #expect(NotificationDeduplicator.shouldNotify(messageID: 10, notifiedMessageIDs: [])); #expect(!NotificationDeduplicator.shouldNotify(messageID: 10, notifiedMessageIDs: [10])) }

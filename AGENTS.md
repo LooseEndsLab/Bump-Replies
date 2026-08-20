@@ -17,6 +17,7 @@ BumpReplies is a local-only macOS menu-bar app. It identifies one-to-one Message
 - Rank messages per conversation by the latest non-reaction message overall, then decide whether it is outgoing.
 - A newer incoming message means the conversation is not waiting on the recipient.
 - Reactions/Tapbacks do not count as the latest conversation message.
+- The Ghosting tab is the inverse view: its latest non-reaction message is incoming and older than the threshold.
 - `Dismiss` hides the current outgoing message; `Ignore Conversation` hides the entire chat until it is unignored.
 
 ## Project constraints

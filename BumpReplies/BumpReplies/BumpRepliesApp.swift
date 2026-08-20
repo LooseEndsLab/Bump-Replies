@@ -18,7 +18,7 @@ struct BumpRepliesApp: App {
         }
         .menuBarExtraStyle(.window)
 
-        Settings {
+        Window("Settings", id: "settings") {
             SettingsView()
                 .environmentObject(model)
         }

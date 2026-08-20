@@ -11,6 +11,7 @@ Nothing leaves your Mac: BumpReplies has no backend, networking, telemetry, anal
 - Ignores reactions/Tapbacks when determining the latest conversation message.
 - Optionally resolves phone numbers and email addresses to local Contacts names.
 - Opens a listed phone-number conversation in Messages when you click its row.
+- Includes a **Ghosting** tab for conversations whose latest non-reaction message is an older incoming message.
 - Supports configurable follow-up thresholds, notifications, group-chat filtering, launch at login, dismissal, and permanent conversation ignoring.
 
 ## Run locally
