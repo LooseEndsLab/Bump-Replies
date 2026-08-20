@@ -6,14 +6,155 @@
 //
 
 import Testing
+import Foundation
+import SQLite3
 @testable import BumpReplies
 
 struct BumpRepliesTests {
 
-    @Test func example() async throws {
-        // Write your test here and use APIs like `#expect(...)` to check expected conditions.
-        // Swift Testing Documentation
-        // https://developer.apple.com/documentation/testing
+    private let now = Date(timeIntervalSinceReferenceDate: 800_000_000)
+    private func message(daysAgo: Int, fromMe: Bool = true, chatID: Int64 = 1, messageID: Int64 = 10) -> ConversationMessage { ConversationMessage(chatID: chatID, chatIdentifier: "test", displayName: "Test", messageID: messageID, date: Calendar.current.date(byAdding: .day, value: -daysAgo, to: now)!, isFromMe: fromMe, isGroupChat: false) }
+    private func results(_ messages: [ConversationMessage], threshold: Int = 7, ignored: Set<Int64> = [], dismissed: Set<Int64> = []) throws -> [FollowUp] { try FollowUpChecker(store: StubStore(messages)).findFollowUps(thresholdDays: threshold, ignoredChatIDs: ignored, dismissedMessageIDs: dismissed, ignoreGroupChats: true, now: now) }
+    @Test func outgoingOlderThanThresholdIsFollowUp() throws { #expect(try results([message(daysAgo: 7)]).count == 1) }
+    @Test func newerOutgoingIsNotFollowUp() throws { #expect(try results([message(daysAgo: 6)]).isEmpty) }
+    @Test func incomingLatestIsNotFollowUp() throws { #expect(try results([message(daysAgo: 20, fromMe: false)]).isEmpty) }
+    @Test func dismissedMessageIsNotFollowUp() throws { #expect(try results([message(daysAgo: 20)], dismissed: [10]).isEmpty) }
+    @Test func ignoredConversationIsNotFollowUp() throws { #expect(try results([message(daysAgo: 20)], ignored: [1]).isEmpty) }
+    @Test func notificationIsOnlyAllowedOncePerMessage() { #expect(NotificationDeduplicator.shouldNotify(messageID: 10, notifiedMessageIDs: [])); #expect(!NotificationDeduplicator.shouldNotify(messageID: 10, notifiedMessageIDs: [10])) }
+    @Test func changingThresholdUpdatesResults() throws { #expect(try results([message(daysAgo: 8)], threshold: 7).count == 1); #expect(try results([message(daysAgo: 8)], threshold: 10).isEmpty) }
+    @Test func appleNanosecondTimestampUsesAppleReferenceEpoch() {
+        let date = SQLiteMessageStore.dateFromAppleNanoseconds(808_949_417_041_999_872)
+        #expect(abs(date.timeIntervalSinceReferenceDate - 808_949_417.042) < 0.001)
+    }
+    @Test func oldOutgoingFollowedByIncomingReplyIsNotWaiting() throws {
+        let conversation = ConversationSelector.latestOverall(from: [message(daysAgo: 20, fromMe: true, messageID: 1), message(daysAgo: 19, fromMe: false, messageID: 2)])
+        #expect(try results(conversation).isEmpty)
+    }
+    @Test func multipleOutgoingMessagesWaitsFromNewestOutgoingMessage() throws {
+        let conversation = ConversationSelector.latestOverall(from: [message(daysAgo: 20, messageID: 1), message(daysAgo: 8, messageID: 2)])
+        let followUps = try results(conversation)
+        #expect(followUps.count == 1)
+        #expect(followUps.first?.messageID == 2)
+    }
+    @Test func incomingFollowedByNewerOutgoingMessageWaits() throws {
+        let conversation = ConversationSelector.latestOverall(from: [message(daysAgo: 20, fromMe: false, messageID: 1), message(daysAgo: 8, fromMe: true, messageID: 2)])
+        #expect(try results(conversation).count == 1)
+    }
+    @Test func oldConversationWithLatestIncomingMessageIsNotWaiting() throws {
+        let conversation = ConversationSelector.latestOverall(from: [message(daysAgo: 400, fromMe: true, messageID: 1), message(daysAgo: 300, fromMe: false, messageID: 2)])
+        #expect(try results(conversation).isEmpty)
+    }
+
+    @Test func oldOutgoingThenNewerIncomingIsNotWaitingInSQLiteStore() throws {
+        let messages = try latestMessagesFromTestDatabase([
+            (date: 10, isFromMe: true),
+            (date: 20, isFromMe: false),
+        ])
+
+        #expect(messages.count == 1)
+        #expect(messages[0].isFromMe == false)
+        #expect(try results(messages).isEmpty)
+    }
+
+    @Test func incomingThenNewerOutgoingWaitsAfterThresholdInSQLiteStore() throws {
+        let messages = try latestMessagesFromTestDatabase([
+            (date: 10, isFromMe: false),
+            (date: 20, isFromMe: true),
+        ])
+
+        #expect(messages.count == 1)
+        #expect(messages[0].isFromMe == true)
+        #expect(try results(messages, threshold: 7).count == 1)
+    }
+
+    @Test func multipleOutgoingMessagesUseNewestOutgoingInSQLiteStore() throws {
+        let messages = try latestMessagesFromTestDatabase([
+            (date: 10, isFromMe: true),
+            (date: 20, isFromMe: true),
+        ])
+
+        #expect(messages.count == 1)
+        #expect(messages[0].messageID == 2)
+    }
+
+    @Test func latestIncomingIsNotWaitingOnThemInSQLiteStore() throws {
+        let messages = try latestMessagesFromTestDatabase([
+            (date: 10, isFromMe: true),
+            (date: 20, isFromMe: false),
+        ])
+
+        #expect(try results(messages).isEmpty)
+    }
+
+    @Test func outgoingReactionDoesNotMakeAnIncomingConversationWaitInSQLiteStore() throws {
+        let messages = try latestMessagesFromTestDatabase([
+            (date: 10, isFromMe: true, associatedMessageType: 0),
+            (date: 20, isFromMe: false, associatedMessageType: 0),
+            (date: 30, isFromMe: true, associatedMessageType: 2000),
+        ])
+
+        #expect(messages.count == 1)
+        #expect(messages[0].isFromMe == false)
+        #expect(try results(messages).isEmpty)
+    }
+
+    @Test func messagesLauncherUsesThePhoneNumberAsTheRecipient() {
+        #expect(MessagesLauncher.url(for: "+15555550123")?.absoluteString == "sms:+15555550123")
+    }
+
+    @Test func messagesLauncherRejectsNonRecipientChatIdentifiers() {
+        #expect(MessagesLauncher.url(for: "iMessage;+;chat123") == nil)
+    }
+
+    @Test func contactNamesMatchEquivalentNorthAmericanPhoneFormats() {
+        var index = ContactNameIndex()
+        index.add(name: "Taylor", phoneNumbers: ["+1 (415) 555-1234"], emailAddresses: [])
+
+        #expect(index.name(for: "4155551234") == "Taylor")
+        #expect(index.name(for: "+14155551234") == "Taylor")
+    }
+
+    @Test func contactNamesMatchEmailIdentifiersCaseInsensitively() {
+        var index = ContactNameIndex()
+        index.add(name: "Riley", phoneNumbers: [], emailAddresses: ["Riley@Example.com"])
+
+        #expect(index.name(for: "riley@example.com") == "Riley")
     }
 
 }
+private struct StubStore: MessageStore { let messages: [ConversationMessage]; init(_ messages: [ConversationMessage]) { self.messages = messages }; func latestConversationMessages() throws -> [ConversationMessage] { messages } }
+
+private func latestMessagesFromTestDatabase(_ messages: [(date: Int64, isFromMe: Bool)]) throws -> [ConversationMessage] {
+    try latestMessagesFromTestDatabase(messages.map { (date: $0.date, isFromMe: $0.isFromMe, associatedMessageType: 0) })
+}
+
+private func latestMessagesFromTestDatabase(_ messages: [(date: Int64, isFromMe: Bool, associatedMessageType: Int64)]) throws -> [ConversationMessage] {
+    let databaseURL = FileManager.default.temporaryDirectory.appending(path: "BumpRepliesTests-\(UUID().uuidString).sqlite")
+    defer { try? FileManager.default.removeItem(at: databaseURL) }
+
+    var database: OpaquePointer?
+    guard sqlite3_open(databaseURL.path(percentEncoded: false), &database) == SQLITE_OK, let database else {
+        throw TestDatabaseError.couldNotOpen
+    }
+    defer { sqlite3_close(database) }
+
+    try execute("CREATE TABLE chat (chat_identifier TEXT, display_name TEXT)", on: database)
+    try execute("CREATE TABLE message (date INTEGER NOT NULL, is_from_me INTEGER NOT NULL, associated_message_type INTEGER NOT NULL DEFAULT 0)", on: database)
+    try execute("CREATE TABLE chat_message_join (chat_id INTEGER NOT NULL, message_id INTEGER NOT NULL)", on: database)
+    try execute("CREATE TABLE chat_handle_join (chat_id INTEGER NOT NULL, handle_id INTEGER NOT NULL)", on: database)
+    try execute("INSERT INTO chat (chat_identifier, display_name) VALUES ('test', 'Test')", on: database)
+    for (index, message) in messages.enumerated() {
+        try execute("INSERT INTO message (date, is_from_me, associated_message_type) VALUES (\(message.date), \(message.isFromMe ? 1 : 0), \(message.associatedMessageType))", on: database)
+        try execute("INSERT INTO chat_message_join (chat_id, message_id) VALUES (1, \(index + 1))", on: database)
+    }
+
+    return try SQLiteMessageStore(databaseURL: databaseURL).latestConversationMessages()
+}
+
+private func execute(_ sql: String, on database: OpaquePointer) throws {
+    guard sqlite3_exec(database, sql, nil, nil, nil) == SQLITE_OK else {
+        throw TestDatabaseError.queryFailed
+    }
+}
+
+private enum TestDatabaseError: Error { case couldNotOpen, queryFailed }

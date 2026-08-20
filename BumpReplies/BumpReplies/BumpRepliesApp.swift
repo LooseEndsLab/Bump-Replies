@@ -9,9 +9,18 @@ import SwiftUI
 
 @main
 struct BumpRepliesApp: App {
+    @StateObject private var model = AppModel()
+
     var body: some Scene {
-        WindowGroup {
-            ContentView()
+        MenuBarExtra("BumpReplies", systemImage: "arrowshape.turn.up.left.circle") {
+            MenuBarView()
+                .environmentObject(model)
+        }
+        .menuBarExtraStyle(.window)
+
+        Settings {
+            SettingsView()
+                .environmentObject(model)
         }
     }
 }
