@@ -21,16 +21,7 @@
 
 ## How it works
 
-```mermaid
-flowchart TD
-    A[Latest non-reaction message<br/>in a one-to-one chat] --> B{Older than your<br/>follow-up threshold?}
-    B -- No --> X[Not shown]
-    B -- Yes --> C{Who sent it?}
-    C -- You --> D[Waiting<br/>They may owe you a reply]
-    C -- Them --> E[Ghosting<br/>You may owe them a reply]
-    D --> F[Likely or All]
-    E --> F
-```
+For each one-to-one chat, BumpReplies looks at its latest non-reaction message. If it is yours, the chat can appear in **Waiting**; if it is theirs, it can appear in **Ghosting**—once the message is older than your chosen threshold.
 
 Reactions do not replace the latest message. By default, a newer reaction from the other person is treated as an acknowledgement; you can change that in Settings. Group chats, dismissed messages, and ignored conversations stay out of the queue.
 
