@@ -121,7 +121,11 @@ private struct SlidingChoiceToggle<Value: Hashable>: View {
         } label: {
             ZStack(alignment: .leading) {
                 Capsule()
-                    .fill(Color(nsColor: .controlBackgroundColor))
+                    .fill(Color.secondary.opacity(0.13))
+                    .overlay {
+                        Capsule()
+                            .stroke(Color.secondary.opacity(0.24), lineWidth: 1)
+                    }
 
                 GeometryReader { geometry in
                     Capsule()
