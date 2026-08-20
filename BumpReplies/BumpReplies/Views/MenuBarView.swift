@@ -1,4 +1,3 @@
-import AppKit
 import SwiftUI
 
 struct MenuBarView: View {
@@ -36,9 +35,11 @@ struct MenuBarView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            HStack(spacing: 6) {
-                Text("BumpReplies").font(.headline)
-                NativeChoiceToggle(
+            HStack(spacing: 10) {
+                Text("BumpReplies")
+                    .font(.subheadline.weight(.semibold))
+                    .padding(.trailing, 2)
+                SlidingChoiceToggle(
                     selection: $selectedTab,
                     first: .waitingOnThem,
                     firstTitle: "Waiting",
@@ -46,13 +47,13 @@ struct MenuBarView: View {
                     secondTitle: "Ghosting",
                     accessibilityLabel: "Conversation type"
                 )
-                .frame(width: 130)
+                .frame(width: 122)
 
                 Text("Show")
-                    .font(.subheadline)
+                    .font(.caption)
                     .foregroundStyle(.secondary)
 
-                NativeChoiceToggle(
+                SlidingChoiceToggle(
                     selection: $likelihoodFilter,
                     first: .likely,
                     firstTitle: "Likely",
@@ -60,9 +61,10 @@ struct MenuBarView: View {
                     secondTitle: "All",
                     accessibilityLabel: "Follow-up likelihood"
                 )
-                .frame(width: 90)
+                .frame(width: 86)
             }
-            .padding()
+            .padding(.horizontal, 14)
+            .padding(.vertical, 16)
 
             Divider()
 
@@ -106,7 +108,7 @@ struct MenuBarView: View {
     }
 }
 
-private struct NativeChoiceToggle<Value: Hashable>: NSViewRepresentable {
+private struct SlidingChoiceToggle<Value: Hashable>: View {
     @Binding var selection: Value
     let first: Value
     let firstTitle: String
@@ -114,33 +116,48 @@ private struct NativeChoiceToggle<Value: Hashable>: NSViewRepresentable {
     let secondTitle: String
     let accessibilityLabel: String
 
-    func makeNSView(context: Context) -> NSSegmentedControl {
-        let control = NSSegmentedControl(labels: [firstTitle, secondTitle], trackingMode: .selectOne, target: context.coordinator, action: #selector(Coordinator.toggleSelection))
-        control.segmentStyle = .rounded
-        control.controlSize = .small
-        control.setAccessibilityLabel(accessibilityLabel)
-        return control
-    }
+    var body: some View {
+        Button {
+            selection = selection == first ? second : first
+        } label: {
+            GeometryReader { proxy in
+                let isFirstSelected = selection == first
 
-    func updateNSView(_ control: NSSegmentedControl, context: Context) {
-        context.coordinator.parent = self
-        control.selectedSegment = selection == first ? 0 : 1
-        control.setAccessibilityValue(selection == first ? firstTitle : secondTitle)
-    }
+                ZStack(alignment: isFirstSelected ? .leading : .trailing) {
+                    Capsule(style: .continuous)
+                        .fill(Color(nsColor: .controlBackgroundColor))
+                        .overlay {
+                            Capsule(style: .continuous)
+                                .stroke(Color(nsColor: .separatorColor).opacity(0.65), lineWidth: 1)
+                        }
 
-    func makeCoordinator() -> Coordinator {
-        Coordinator(parent: self)
-    }
+                    Capsule(style: .continuous)
+                        .fill(Color.accentColor)
+                        .padding(2)
+                        .frame(width: proxy.size.width / 2)
+                        .shadow(color: .black.opacity(0.10), radius: 0.5, y: 0.5)
+                        .animation(.easeInOut(duration: 0.18), value: isFirstSelected)
 
-    final class Coordinator: NSObject {
-        var parent: NativeChoiceToggle
-
-        init(parent: NativeChoiceToggle) {
-            self.parent = parent
+                    HStack(spacing: 0) {
+                        choiceLabel(firstTitle, selected: isFirstSelected)
+                        choiceLabel(secondTitle, selected: !isFirstSelected)
+                    }
+                }
+            }
         }
+        .buttonStyle(.plain)
+        .frame(height: 28)
+        .accessibilityLabel(accessibilityLabel)
+        .accessibilityValue(selection == first ? firstTitle : secondTitle)
+        .accessibilityHint("Click to switch to the other option")
+    }
 
-        @objc func toggleSelection() {
-            parent.selection = parent.selection == parent.first ? parent.second : parent.first
-        }
+    private func choiceLabel(_ title: String, selected: Bool) -> some View {
+        Text(title)
+            .font(.subheadline.weight(.medium))
+            .foregroundStyle(selected ? .white : .primary)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .contentShape(Rectangle())
+            .animation(.easeInOut(duration: 0.12), value: selected)
     }
 }
