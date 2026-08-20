@@ -37,26 +37,26 @@ struct MenuBarView: View {
         VStack(alignment: .leading, spacing: 0) {
             HStack(spacing: 6) {
                 Text("BumpReplies").font(.headline)
-                Picker("Conversation type", selection: $selectedTab) {
-                    ForEach(ConversationTab.allCases) { tab in
-                        Text(tab.rawValue).tag(tab)
-                    }
-                }
-                .labelsHidden()
-                .pickerStyle(.segmented)
+                SlidingChoiceToggle(
+                    selection: $selectedTab,
+                    first: .waitingOnThem,
+                    firstTitle: "Waiting",
+                    second: .waitingOnYou,
+                    secondTitle: "Ghosting"
+                )
                 .frame(width: 130)
 
                 Text("Show")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
 
-                Picker("Follow-up likelihood", selection: $likelihoodFilter) {
-                    ForEach(LikelihoodFilter.allCases) { filter in
-                        Text(filter.rawValue).tag(filter)
-                    }
-                }
-                .labelsHidden()
-                .pickerStyle(.segmented)
+                SlidingChoiceToggle(
+                    selection: $likelihoodFilter,
+                    first: .likely,
+                    firstTitle: "Likely",
+                    second: .all,
+                    secondTitle: "All"
+                )
                 .frame(width: 90)
             }
             .padding()
@@ -100,5 +100,53 @@ struct MenuBarView: View {
                 .padding(.vertical, 8)
             }
         }
+    }
+}
+
+private struct SlidingChoiceToggle<Value: Hashable>: View {
+    @Binding var selection: Value
+    let first: Value
+    let firstTitle: String
+    let second: Value
+    let secondTitle: String
+
+    var body: some View {
+        ZStack(alignment: .leading) {
+            Capsule()
+                .fill(Color(nsColor: .controlBackgroundColor))
+
+            GeometryReader { geometry in
+                Capsule()
+                    .fill(Color.accentColor)
+                    .frame(width: (geometry.size.width - 4) / 2, height: geometry.size.height - 4)
+                    .offset(x: selection == first ? 2 : geometry.size.width / 2)
+            }
+            .allowsHitTesting(false)
+
+            HStack(spacing: 0) {
+                optionButton(title: firstTitle, value: first)
+                optionButton(title: secondTitle, value: second)
+            }
+        }
+        .frame(height: 28)
+        .animation(.easeInOut(duration: 0.18), value: selection)
+        .accessibilityElement(children: .contain)
+    }
+
+    private func optionButton(title: String, value: Value) -> some View {
+        Button {
+            withAnimation(.easeInOut(duration: 0.18)) {
+                selection = value
+            }
+        } label: {
+            Text(title)
+                .font(.subheadline.weight(.medium))
+                .foregroundStyle(selection == value ? .white : .primary)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .contentShape(Capsule())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(title)
+        .accessibilityAddTraits(selection == value ? .isSelected : [])
     }
 }
