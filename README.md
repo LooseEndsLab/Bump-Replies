@@ -49,3 +49,9 @@ xcodebuild test \
   -destination 'platform=macOS,arch=arm64' \
   -only-testing:BumpRepliesTests
 ```
+
+## Open issues
+
+<!-- open-issues:start -->
+- [#1: TODO: publish/package](https://github.com/LooseEndsLab/Bump-Replies/issues/1)
+<!-- open-issues:end -->

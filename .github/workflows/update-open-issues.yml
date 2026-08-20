@@ -1,0 +1,70 @@
+name: Update open issues in README
+
+on:
+  issues:
+    types: [opened, closed, reopened, edited]
+  schedule:
+    - cron: "17 3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: read
+
+jobs:
+  update-readme:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate the open-issues list
+        id: generate
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const fs = require("fs");
+            const readmePath = "README.md";
+            const issues = await github.paginate(github.rest.issues.listForRepo, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: "open",
+              per_page: 100,
+            });
+            const escapeMarkdown = (value) => value
+              .replaceAll(String.fromCharCode(13), " ")
+              .replaceAll(String.fromCharCode(10), " ")
+              .replaceAll("[", "\\[")
+              .replaceAll("]", "\\]");
+            const openIssues = issues.filter((issue) => !issue.pull_request);
+            const list = openIssues.length
+              ? openIssues.map((issue) =>
+                  "- [#" + issue.number + ": " + escapeMarkdown(issue.title) + "](" + issue.html_url + ")"
+                ).join("\n")
+              : "No open issues.";
+            const replacement = [
+              "<!-- open-issues:start -->",
+              list,
+              "<!-- open-issues:end -->",
+            ].join("\n");
+            const readme = fs.readFileSync(readmePath, "utf8");
+            const updated = readme.replace(
+              /<!-- open-issues:start -->[\s\S]*?<!-- open-issues:end -->/,
+              replacement,
+            );
+
+            if (updated === readme) {
+              core.setOutput("changed", "false");
+              return;
+            }
+
+            fs.writeFileSync(readmePath, updated);
+            core.setOutput("changed", "true");
+
+      - name: Commit the updated list
+        if: steps.generate.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md
+          git commit -m "docs: update open issues list"
+          git push
