@@ -13,7 +13,7 @@ import SQLite3
 struct BumpRepliesTests {
 
     private let now = Date(timeIntervalSinceReferenceDate: 800_000_000)
-    private func message(daysAgo: Int, fromMe: Bool = true, chatID: Int64 = 1, messageID: Int64 = 10) -> ConversationMessage { ConversationMessage(chatID: chatID, chatIdentifier: "test", displayName: "Test", messageID: messageID, date: Calendar.current.date(byAdding: .day, value: -daysAgo, to: now)!, isFromMe: fromMe, isGroupChat: false) }
+    private func message(daysAgo: Int, fromMe: Bool = true, chatID: Int64 = 1, messageID: Int64 = 10, text: String? = nil, hasReactionResponse: Bool = false) -> ConversationMessage { ConversationMessage(chatID: chatID, chatIdentifier: "test", displayName: "Test", messageID: messageID, date: Calendar.current.date(byAdding: .day, value: -daysAgo, to: now)!, isFromMe: fromMe, isGroupChat: false, hasOppositeDirectionReactionAfterMessage: hasReactionResponse, likelihood: FollowUpLikelihood.classify(messageText: text)) }
     private func results(_ messages: [ConversationMessage], threshold: Int = 7, ignored: Set<Int64> = [], dismissed: Set<Int64> = []) throws -> [FollowUp] { try FollowUpChecker(store: StubStore(messages)).findFollowUps(thresholdDays: threshold, ignoredChatIDs: ignored, dismissedMessageIDs: dismissed, ignoreGroupChats: true, now: now) }
     private func ghostedResults(_ messages: [ConversationMessage], threshold: Int = 7, ignored: Set<Int64> = [], dismissed: Set<Int64> = []) throws -> [FollowUp] { try FollowUpChecker(store: StubStore(messages)).findGhostedConversations(thresholdDays: threshold, ignoredChatIDs: ignored, dismissedMessageIDs: dismissed, ignoreGroupChats: true, now: now) }
     @Test func outgoingOlderThanThresholdIsFollowUp() throws { #expect(try results([message(daysAgo: 7)]).count == 1) }
@@ -102,6 +102,17 @@ struct BumpRepliesTests {
         #expect(try results(messages).isEmpty)
     }
 
+    @Test func newerReactionFromTheOtherPersonIsRecordedAsAResponseInSQLiteStore() throws {
+        let messages = try latestMessagesFromTestDatabase([
+            (date: 10, isFromMe: true, associatedMessageType: 0),
+            (date: 20, isFromMe: false, associatedMessageType: 2000),
+        ])
+
+        #expect(messages.count == 1)
+        #expect(messages[0].isFromMe)
+        #expect(messages[0].hasOppositeDirectionReactionAfterMessage)
+    }
+
     @Test func messagesLauncherUsesThePhoneNumberAsTheRecipient() {
         #expect(MessagesLauncher.url(for: "+15555550123")?.absoluteString == "sms:+15555550123")
     }
@@ -125,6 +136,57 @@ struct BumpRepliesTests {
         #expect(index.name(for: "riley@example.com") == "Riley")
     }
 
+    @Test func questionIsLikelyForEitherConversationDirection() {
+        #expect(FollowUpLikelihood.classify(messageText: "Are you free Thursday?").isLikely)
+        #expect(FollowUpLikelihood.classify(messageText: "Can you send the deck").isLikely)
+    }
+
+    @Test func acknowledgementIsKeptForReviewRatherThanLikely() {
+        #expect(FollowUpLikelihood.classify(messageText: "Sounds good, thanks!") == .review)
+        #expect(FollowUpLikelihood.classify(messageText: nil) == .review)
+    }
+
+    @Test func likelihoodLabelCanNameTheSender() {
+        #expect(FollowUpLikelihood.likely(reason: "asked a question").label(subject: "you") == "Likely: you asked a question")
+        #expect(FollowUpLikelihood.review.label(subject: "you") == "Review")
+    }
+
+    @Test func reactionFromTheOtherPersonSuppressesWaitingByDefault() throws {
+        #expect(try results([message(daysAgo: 20, hasReactionResponse: true)]).isEmpty)
+        #expect(try FollowUpChecker(store: StubStore([message(daysAgo: 20, hasReactionResponse: true)])).findFollowUps(thresholdDays: 7, ignoredChatIDs: [], dismissedMessageIDs: [], ignoreGroupChats: true, treatReactionsAsReplies: false, now: now).count == 1)
+    }
+
+    @Test func reactionFromMeSuppressesGhostingByDefault() throws {
+        #expect(try ghostedResults([message(daysAgo: 20, fromMe: false, hasReactionResponse: true)]).isEmpty)
+    }
+
+    @Test func attributedBodyTextIsUsedWhenPlainTextIsMissing() throws {
+        let archive = try NSKeyedArchiver.archivedData(withRootObject: NSAttributedString(string: "Can you send the deck?"), requiringSecureCoding: true)
+        #expect(MessageTextExtractor.text(plainText: nil, attributedBody: archive) == "Can you send the deck?")
+        #expect(FollowUpLikelihood.classify(messageText: MessageTextExtractor.text(plainText: nil, attributedBody: archive)).isLikely)
+    }
+
+    @Test func attributedBodyWithMessagesPrefixIsDecoded() throws {
+        let archive = try NSKeyedArchiver.archivedData(withRootObject: NSAttributedString(string: "Let me know your availability"), requiringSecureCoding: true)
+        #expect(MessageTextExtractor.text(plainText: nil, attributedBody: Data([0x01, 0x02, 0x03]) + archive) == "Let me know your availability")
+    }
+
+    @Test func legacyAttributedBodyIsDecoded() throws {
+        let archive = try NSKeyedArchiver.archivedData(withRootObject: NSAttributedString(string: "When can we reschedule our meeting?"), requiringSecureCoding: false)
+        #expect(MessageTextExtractor.text(plainText: nil, attributedBody: archive) == "When can we reschedule our meeting?")
+    }
+
+    @Test func typedArchiveAttributedBodyIsDecoded() {
+        let archive = NSArchiver.archivedData(withRootObject: NSAttributedString(string: "Could I stop by when you are free?"))
+        #expect(MessageTextExtractor.text(plainText: nil, attributedBody: archive) == "Could I stop by when you are free?")
+        #expect(FollowUpLikelihood.classify(messageText: MessageTextExtractor.text(plainText: nil, attributedBody: archive)).isLikely)
+    }
+
+    @Test func plainTextTakesPrecedenceOverAttributedBody() throws {
+        let archive = try NSKeyedArchiver.archivedData(withRootObject: NSAttributedString(string: "Can you send the deck?"), requiringSecureCoding: true)
+        #expect(MessageTextExtractor.text(plainText: "Sounds good", attributedBody: archive) == "Sounds good")
+    }
+
 }
 private struct StubStore: MessageStore { let messages: [ConversationMessage]; init(_ messages: [ConversationMessage]) { self.messages = messages }; func latestConversationMessages() throws -> [ConversationMessage] { messages } }
 
@@ -143,7 +205,7 @@ private func latestMessagesFromTestDatabase(_ messages: [(date: Int64, isFromMe:
     defer { sqlite3_close(database) }
 
     try execute("CREATE TABLE chat (chat_identifier TEXT, display_name TEXT)", on: database)
-    try execute("CREATE TABLE message (date INTEGER NOT NULL, is_from_me INTEGER NOT NULL, associated_message_type INTEGER NOT NULL DEFAULT 0)", on: database)
+    try execute("CREATE TABLE message (date INTEGER NOT NULL, is_from_me INTEGER NOT NULL, associated_message_type INTEGER NOT NULL DEFAULT 0, text TEXT, attributedBody BLOB)", on: database)
     try execute("CREATE TABLE chat_message_join (chat_id INTEGER NOT NULL, message_id INTEGER NOT NULL)", on: database)
     try execute("CREATE TABLE chat_handle_join (chat_id INTEGER NOT NULL, handle_id INTEGER NOT NULL)", on: database)
     try execute("INSERT INTO chat (chat_identifier, display_name) VALUES ('test', 'Test')", on: database)

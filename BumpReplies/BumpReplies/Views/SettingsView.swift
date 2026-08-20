@@ -1,4 +1,164 @@
 import SwiftUI
-struct SettingsView: View { @EnvironmentObject private var model: AppModel
-    var body: some View { Form { Stepper("Follow up after: \(model.thresholdDays) days", value: $model.thresholdDays, in: 1...365); Stepper("Ignore conversations older than: \(model.maximumConversationAgeDays) days", value: $model.maximumConversationAgeDays, in: model.thresholdDays...3650); Toggle("Notifications", isOn: $model.notificationsEnabled); Toggle("Ignore group chats", isOn: $model.ignoreGroupChats); Toggle("Launch at Login", isOn: $model.launchAtLogin); Section("Ignored Conversations") { if model.ignoredChats.isEmpty { Text("None").foregroundStyle(.secondary) } else { ForEach(model.ignoredChats, id: \.self) { id in HStack { Text("Chat \(id)"); Spacer(); Button("Unignore") { model.unignore(id) } } } } } }.formStyle(.grouped).padding().frame(width: 430, height: 330) }
+
+struct SettingsView: View {
+    @EnvironmentObject private var model: AppModel
+    @FocusState private var isThresholdFieldFocused: Bool
+    @FocusState private var isMaximumAgeFieldFocused: Bool
+    @State private var thresholdDaysText = ""
+    @State private var maximumAgeDaysText = ""
+
+    var body: some View {
+        Form {
+            Section {
+                LabeledContent("Follow up after") {
+                    daysField(text: $thresholdDaysText, isFocused: $isThresholdFieldFocused, onSubmit: commitThresholdDays)
+                }
+
+                LabeledContent("Ignore conversations older than") {
+                    daysField(text: $maximumAgeDaysText, isFocused: $isMaximumAgeFieldFocused, onSubmit: commitMaximumAgeDays)
+                }
+
+                Text("Enter a value between \(model.thresholdDays) and 3,650 days. The default is 90 days.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            } header: {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("BumpReplies Settings")
+                        .font(.title2.weight(.semibold))
+                    Text("Choose which conversations should appear in your follow-up list.")
+                        .foregroundStyle(.secondary)
+                    Text("Follow-up filtering")
+                        .font(.headline)
+                        .padding(.top, 20)
+                }
+                .textCase(nil)
+            }
+
+            Section("App behavior") {
+                Toggle("Notifications", isOn: $model.notificationsEnabled)
+                    .tint(.accentColor)
+                Toggle("Ignore group chats", isOn: $model.ignoreGroupChats)
+                    .tint(.accentColor)
+                Toggle("Treat reactions as replies", isOn: $model.treatReactionsAsReplies)
+                    .tint(.accentColor)
+                Toggle("Launch at Login", isOn: $model.launchAtLogin)
+                    .tint(.accentColor)
+            }
+
+            Section("Ignored Conversations") {
+                if model.ignoredChats.isEmpty {
+                    Text("No conversations are currently ignored.")
+                        .foregroundStyle(.secondary)
+                } else {
+                    ForEach(model.ignoredChats, id: \.self) { id in
+                        HStack {
+                            Text("Chat \(id)")
+                            Spacer()
+                            Button("Unignore") { model.unignore(id) }
+                        }
+                    }
+                }
+            }
+
+            Section("How “Likely” is calculated") {
+                likelihoodExplanation(
+                    title: "1. Find the latest conversation message",
+                    detail: "For each one-to-one chat, BumpReplies finds the latest non-reaction message overall before checking who sent it. A newer normal reply means the chat is not pending."
+                )
+
+                likelihoodExplanation(
+                    title: "2. Apply the response rule",
+                    detail: "Your latest message appears in Waiting; their latest message appears in Ghosting. When “Treat reactions as replies” is on, a newer reaction from the other person also counts as an acknowledgement."
+                )
+
+                likelihoodExplanation(
+                    title: "3. Apply the age limits",
+                    detail: "“Follow up after” is the minimum number of days since that latest message. “Ignore conversations older than” excludes chats beyond that maximum age."
+                )
+
+                likelihoodExplanation(
+                    title: "4. Rank likely follow-ups",
+                    detail: "Only the latest eligible message is read locally and transiently. A chat is Likely when that message has a question mark, asks a direct question or decision, or makes a request (for example, “can you,” “please,” or “let me know”). Everything else remains available under All."
+                )
+            }
+        }
+        .formStyle(.grouped)
+        .frame(width: 460, height: 690)
+        .onAppear(perform: syncDayFields)
+        .onChange(of: isThresholdFieldFocused) { isFocused in
+            if !isFocused { commitThresholdDays() }
+        }
+        .onChange(of: isMaximumAgeFieldFocused) { isFocused in
+            if !isFocused { commitMaximumAgeDays() }
+        }
+        .onChange(of: model.thresholdDays) { _ in
+            if !isThresholdFieldFocused { syncThresholdDaysText() }
+        }
+        .onChange(of: model.maximumConversationAgeDays) { _ in
+            if !isMaximumAgeFieldFocused { syncMaximumAgeDaysText() }
+        }
+    }
+
+    private func daysField(text: Binding<String>, isFocused: FocusState<Bool>.Binding, onSubmit: @escaping () -> Void) -> some View {
+        HStack(spacing: 6) {
+            TextField("", text: text)
+                .labelsHidden()
+                .frame(width: 54)
+                .multilineTextAlignment(.trailing)
+                .focused(isFocused)
+                .onSubmit(onSubmit)
+            Text("days")
+                .foregroundStyle(.secondary)
+        }
+    }
+
+    private func likelihoodExplanation(title: String, detail: String) -> some View {
+        VStack(alignment: .leading, spacing: 3) {
+            Text(title)
+                .font(.subheadline.weight(.semibold))
+            Text(detail)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+        .padding(.vertical, 2)
+    }
+
+    private func commitThresholdDays() {
+        guard let days = Int(thresholdDaysText) else {
+            syncThresholdDaysText()
+            return
+        }
+
+        let thresholdDays = min(max(days, 1), 365)
+        if thresholdDays != model.thresholdDays {
+            model.thresholdDays = thresholdDays
+        }
+        syncDayFields()
+    }
+
+    private func commitMaximumAgeDays() {
+        guard let days = Int(maximumAgeDaysText) else {
+            syncMaximumAgeDaysText()
+            return
+        }
+
+        let maximumAgeDays = min(max(days, model.thresholdDays), 3650)
+        if maximumAgeDays != model.maximumConversationAgeDays {
+            model.maximumConversationAgeDays = maximumAgeDays
+        }
+        syncMaximumAgeDaysText()
+    }
+
+    private func syncMaximumAgeDaysText() {
+        maximumAgeDaysText = String(model.maximumConversationAgeDays)
+    }
+
+    private func syncThresholdDaysText() {
+        thresholdDaysText = String(model.thresholdDays)
+    }
+
+    private func syncDayFields() {
+        syncThresholdDaysText()
+        syncMaximumAgeDaysText()
+    }
 }

@@ -8,7 +8,7 @@ BumpReplies is a local-only macOS menu-bar app. It identifies one-to-one Message
 
 - Keep all data local. Do not add networking, telemetry, analytics, cloud services, or an LLM/API integration without explicit approval.
 - `~/Library/Messages/chat.db` is read-only. Open it with SQLite read-only mode and keep `PRAGMA query_only = ON`.
-- Never query message bodies, attachments, message text, or handle/contact data from `chat.db`. Query only the minimal metadata needed for follow-up classification.
+- The only permitted message-body access is the latest non-reaction message's `text` or `attributedBody`, read locally and transiently to classify likely follow-ups. Never persist, log, send, or otherwise expose message text. Do not query attachments or handle/contact data from `chat.db`.
 - Contacts access is optional and local. If denied, keep showing raw chat identifiers.
 - Do not log identifiers, contact data, or message metadata.
 

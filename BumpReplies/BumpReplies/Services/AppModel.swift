@@ -6,17 +6,50 @@ import Combine
     @Published var maximumConversationAgeDays: Int { didSet { if maximumConversationAgeDays < thresholdDays { maximumConversationAgeDays = thresholdDays; return }; defaults.set(max(1, maximumConversationAgeDays), forKey: "maximumConversationAgeDays"); refresh() } }
     @Published var notificationsEnabled: Bool { didSet { defaults.set(notificationsEnabled, forKey: "notificationsEnabled"); if notificationsEnabled { Task { _ = await notifier.requestAuthorization(); await refreshNotifications() } } } }
     @Published var ignoreGroupChats: Bool { didSet { defaults.set(ignoreGroupChats, forKey: "ignoreGroupChats"); refresh() } }
+    @Published var treatReactionsAsReplies: Bool { didSet { defaults.set(treatReactionsAsReplies, forKey: "treatReactionsAsReplies"); refresh() } }
     @Published var launchAtLogin: Bool { didSet { defaults.set(launchAtLogin, forKey: "launchAtLogin"); do { try LaunchAtLoginManager.setEnabled(launchAtLogin) } catch { errorMessage = "Could not change Launch at Login: \(error.localizedDescription)" } } }
     private let store: MessageStore; private let notifier: NotificationManager; private let defaults: UserDefaults; private let contactsNameResolver = ContactsNameResolver()
     private var ignoredChatIDs: Set<Int64>; private var dismissedMessageIDs: Set<Int64>; private var notifiedMessageIDs: Set<Int64>
+    private var refreshGeneration = 0
     @Published private(set) var contactNames: [String: String] = [:]
     init(store: MessageStore = SQLiteMessageStore(), notifier: NotificationManager = NotificationManager(), defaults: UserDefaults = .standard) {
         let initialThresholdDays = max(1, defaults.object(forKey: "thresholdDays") as? Int ?? 7)
         let initialMaximumConversationAgeDays = max(initialThresholdDays, defaults.object(forKey: "maximumConversationAgeDays") as? Int ?? 90)
-        self.store = store; self.notifier = notifier; self.defaults = defaults; thresholdDays = initialThresholdDays; maximumConversationAgeDays = initialMaximumConversationAgeDays; notificationsEnabled = defaults.object(forKey: "notificationsEnabled") as? Bool ?? false; ignoreGroupChats = defaults.object(forKey: "ignoreGroupChats") as? Bool ?? true; launchAtLogin = defaults.object(forKey: "launchAtLogin") as? Bool ?? LaunchAtLoginManager.isEnabled
+        self.store = store; self.notifier = notifier; self.defaults = defaults; thresholdDays = initialThresholdDays; maximumConversationAgeDays = initialMaximumConversationAgeDays; notificationsEnabled = defaults.object(forKey: "notificationsEnabled") as? Bool ?? false; ignoreGroupChats = defaults.object(forKey: "ignoreGroupChats") as? Bool ?? true; treatReactionsAsReplies = defaults.object(forKey: "treatReactionsAsReplies") as? Bool ?? true; launchAtLogin = defaults.object(forKey: "launchAtLogin") as? Bool ?? LaunchAtLoginManager.isEnabled
         ignoredChatIDs = Set(defaults.array(forKey: "ignoredChatIDs") as? [Int64] ?? []); dismissedMessageIDs = Set(defaults.array(forKey: "dismissedMessageIDs") as? [Int64] ?? []); notifiedMessageIDs = Set(defaults.array(forKey: "notifiedMessageIDs") as? [Int64] ?? []); refresh()
     }
-    func refresh() { do { let statuses = try FollowUpChecker(store: store).findConversationStatuses(thresholdDays: thresholdDays, maximumAgeDays: maximumConversationAgeDays, ignoredChatIDs: ignoredChatIDs, dismissedMessageIDs: dismissedMessageIDs, ignoreGroupChats: ignoreGroupChats); followUps = statuses.waitingOnThem; ghostedConversations = statuses.waitingOnYou; errorMessage = nil; Task { await refreshContactNames(); await refreshNotifications() } } catch { followUps = []; ghostedConversations = []; errorMessage = error.localizedDescription } }
+    func refresh() {
+        refreshGeneration += 1
+        let generation = refreshGeneration
+        let store = store
+        let thresholdDays = thresholdDays
+        let maximumConversationAgeDays = maximumConversationAgeDays
+        let ignoredChatIDs = ignoredChatIDs
+        let dismissedMessageIDs = dismissedMessageIDs
+        let ignoreGroupChats = ignoreGroupChats
+        let treatReactionsAsReplies = treatReactionsAsReplies
+
+        DispatchQueue.global(qos: .userInitiated).async {
+            let result = Result {
+                try FollowUpChecker(store: store).findConversationStatuses(thresholdDays: thresholdDays, maximumAgeDays: maximumConversationAgeDays, ignoredChatIDs: ignoredChatIDs, dismissedMessageIDs: dismissedMessageIDs, ignoreGroupChats: ignoreGroupChats, treatReactionsAsReplies: treatReactionsAsReplies)
+            }
+
+            Task { @MainActor [weak self] in
+                guard let self, self.refreshGeneration == generation else { return }
+                switch result {
+                case .success(let statuses):
+                    followUps = statuses.waitingOnThem
+                    ghostedConversations = statuses.waitingOnYou
+                    errorMessage = nil
+                    Task { await refreshContactNames(); await refreshNotifications() }
+                case .failure(let error):
+                    followUps = []
+                    ghostedConversations = []
+                    errorMessage = error.localizedDescription
+                }
+            }
+        }
+    }
     func dismiss(_ item: FollowUp) { dismissedMessageIDs.insert(item.messageID); save(dismissedMessageIDs, "dismissedMessageIDs"); refresh() }
     func ignore(_ item: FollowUp) { ignoredChatIDs.insert(item.chatID); save(ignoredChatIDs, "ignoredChatIDs"); refresh() }
     func openInMessages(_ item: FollowUp) { MessagesLauncher.open(chatIdentifier: item.conversation.chatIdentifier) }

@@ -8,6 +8,10 @@ A private, local-first macOS menu-bar app that spots one-to-one Messages convers
 - Keeps replied-to chats out of the list, and includes a **Ghosting** view for older incoming messages.
 - Supports likely-follow-up filtering, notifications, dismissing, ignored conversations, optional Contacts names, and configurable settings.
 
+## Likely follow-ups
+
+Likely is a local priority filter, not a separate definition of a pending chat. BumpReplies first finds each one-to-one chat’s latest non-reaction message, applies the response and age rules, then marks it Likely when that latest message is a question, asks for a decision, or makes a direct request. Messages without those signals remain under **All**. The **Follow up after** setting is the minimum age of that latest message; the maximum-age setting excludes stale conversations.
+
 ## Run
 
 1. Open [BumpReplies.xcodeproj](BumpReplies/BumpReplies.xcodeproj) in Xcode and run the **BumpReplies** scheme.

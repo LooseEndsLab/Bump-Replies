@@ -3,6 +3,7 @@ struct FollowUpRow: View {
     @EnvironmentObject private var model: AppModel
     let followUp: FollowUp
     let statusText: String
+    let likelihoodSubject: String?
 
     var body: some View {
         HStack(spacing: 12) {
@@ -12,7 +13,7 @@ struct FollowUpRow: View {
                 HStack {
                     VStack(alignment: .leading) {
                         Text(model.name(for: followUp)).lineLimit(1)
-                        Text("\(followUp.daysOld())d \(statusText)")
+                        Text("\(followUp.likelihood.label(subject: likelihoodSubject)) · \(followUp.daysOld())d \(statusText)")
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
