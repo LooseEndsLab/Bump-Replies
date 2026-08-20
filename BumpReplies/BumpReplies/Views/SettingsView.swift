@@ -77,13 +77,18 @@ struct SettingsView: View {
                 )
 
                 likelihoodExplanation(
-                    title: "4. Rank likely follow-ups",
-                    detail: "Only the latest eligible message is read locally and transiently. A chat is Likely when that message has a question mark, asks a direct question or decision, or makes a request (for example, “can you,” “please,” or “let me know”). Everything else remains available under All."
+                    title: "4. Apply the exact local text checks",
+                    detail: "Only the latest eligible message is read locally and transiently. Its text is lowercased and runs of whitespace are collapsed before these checks:\n• Contains “?” → asked a question.\n• Starts with “can you”, “could you”, “would you”, or “will you” → made a request.\n• Contains “please”, “let me know”, “lmk”, “send me”, “confirm”, or “any update” → made a request.\n• Starts with “when ”, “what ”, “where ”, “which ”, “who ”, “how ”, “are you”, “do you”, “did you”, “have you”, or “should we” → asked for a decision."
+                )
+
+                likelihoodExplanation(
+                    title: "5. Keep everything else available for review",
+                    detail: "An empty message, or a message that matches none of those checks, is marked Review rather than Likely. It remains in All if it passed the conversation, response, and age rules above. Message text is never saved or sent anywhere."
                 )
             }
         }
         .formStyle(.grouped)
-        .frame(width: 460, height: 690)
+        .frame(width: 500, height: 850)
         .onAppear(perform: syncDayFields)
         .onChange(of: isThresholdFieldFocused) { isFocused in
             if !isFocused { commitThresholdDays() }
