@@ -73,7 +73,7 @@ struct SettingsView: View {
                 }
             }
 
-            Section("How “Likely” is calculated") {
+            Section("How “Suggested” is calculated") {
                 likelihoodExplanation(
                     title: "1. Find the latest conversation message",
                     detail: "For each one-to-one chat, BumpReplies finds the latest non-reaction message overall before checking who sent it. A newer normal reply means the chat is not pending."
@@ -96,7 +96,7 @@ struct SettingsView: View {
 
                 likelihoodExplanation(
                     title: "5. Keep everything else available for review",
-                    detail: "An empty message, or a message that matches none of those checks, is marked Review rather than Likely. It remains in All if it passed the conversation, response, and age rules above. Message text is never saved or sent anywhere."
+                    detail: "An empty message, or a message that matches none of those checks, is marked Review rather than Suggested. It remains in All if it passed the conversation, response, and age rules above. Message text is never saved or sent anywhere."
                 )
             }
         }

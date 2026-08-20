@@ -9,7 +9,7 @@ struct MenuBarView: View {
     }
 
     private enum LikelihoodFilter: String, CaseIterable, Identifiable {
-        case likely = "Likely"
+        case likely = "Suggested"
         case all = "All"
 
         var id: Self { self }
@@ -56,7 +56,7 @@ struct MenuBarView: View {
                 SlidingChoiceToggle(
                     selection: $likelihoodFilter,
                     first: .likely,
-                    firstTitle: "Likely",
+                    firstTitle: "Suggested",
                     second: .all,
                     secondTitle: "All",
                     accentColor: model.accentColor.color,
@@ -93,8 +93,8 @@ struct MenuBarView: View {
         } else if conversations.isEmpty {
             VStack(spacing: 6) {
                 Image(systemName: "checkmark.circle").font(.title2).foregroundStyle(.secondary)
-                Text(likelihoodFilter == .likely ? "No likely follow-ups" : (selectedTab == .waitingOnThem ? "No conversations waiting" : "No unanswered conversations"))
-                Text(likelihoodFilter == .likely ? "Use All to review every older conversation." : (selectedTab == .waitingOnThem ? "You’re all caught up." : "No one is waiting on your reply.")).font(.caption).foregroundStyle(.secondary)
+                Text(likelihoodFilter == .likely ? "No suggested follow-ups" : (selectedTab == .waitingOnThem ? "No conversations waiting" : "No unanswered conversations"))
+                Text(likelihoodFilter == .likely ? "Use All to review every eligible conversation." : (selectedTab == .waitingOnThem ? "You’re all caught up." : "No one is waiting on your reply.")).font(.caption).foregroundStyle(.secondary)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else {

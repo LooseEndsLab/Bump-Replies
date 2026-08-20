@@ -6,7 +6,7 @@ A private, local macOS menu-bar app for finding one-to-one Messages chats that m
 
 - **Waiting:** chats where your latest non-reaction message is still awaiting a reply.
 - **Ghosting:** chats where the other person's latest non-reaction message is awaiting you.
-- **Likely:** prioritizes questions and requests; **All** includes every eligible chat.
+- **Suggested:** prioritizes questions and requests; **All** includes every eligible chat.
 - Dismiss a message or ignore a conversation to keep the queue tidy.
 
 Set a minimum follow-up age and a maximum age for stale conversations in Settings. Group chats and reactions are excluded from the latest-message calculation.
