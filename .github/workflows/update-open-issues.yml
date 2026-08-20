@@ -36,7 +36,9 @@ jobs:
               .replaceAll("[", "\\[")
               .replaceAll("]", "\\]")
               .replaceAll("|", "\\|");
-            const openIssues = issues.filter((issue) => !issue.pull_request);
+            const openIssues = issues
+              .filter((issue) => !issue.pull_request)
+              .sort((left, right) => left.number - right.number);
             const tableHeader = [
               "| Issue | Title | Labels |",
               "| --- | --- | --- |",
