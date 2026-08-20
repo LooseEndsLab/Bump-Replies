@@ -35,7 +35,7 @@ struct MenuBarView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            HStack(spacing: 8) {
+            HStack(spacing: 14) {
                 Text("BumpReplies")
                     .font(.headline)
                 SlidingChoiceToggle(
