@@ -100,7 +100,7 @@ struct MenuBarView: View {
                 LazyVStack(spacing: 0) {
                     ForEach(conversations) { FollowUpRow(followUp: $0, statusText: statusText, likelihoodSubject: likelihoodSubject) }
                 }
-                .padding(.horizontal, 8)
+                .padding(.horizontal, 12)
                 .padding(.vertical, 8)
             }
         }
