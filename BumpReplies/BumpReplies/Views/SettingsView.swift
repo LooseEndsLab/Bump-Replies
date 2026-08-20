@@ -24,6 +24,14 @@ struct SettingsView: View {
                 }
                 .textCase(nil)
             }
+            Section("Appearance") {
+                Picker("Accent color", selection: $model.accentColor) {
+                    ForEach(AppAccent.allCases) { accent in
+                        Text(accent.title).tag(accent)
+                    }
+                }
+            }
+
 
             Section("Follow-up filtering") {
                 LabeledContent("Follow up after") {

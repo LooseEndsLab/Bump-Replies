@@ -15,12 +15,14 @@ struct BumpRepliesApp: App {
         MenuBarExtra("BumpReplies", systemImage: "arrowshape.turn.up.left.circle") {
             MenuBarView()
                 .environmentObject(model)
+                .tint(model.accentColor.color)
         }
         .menuBarExtraStyle(.window)
 
         Window("Settings", id: "settings") {
             SettingsView()
                 .environmentObject(model)
+                .tint(model.accentColor.color)
         }
     }
 }

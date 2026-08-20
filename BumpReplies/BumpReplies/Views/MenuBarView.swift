@@ -44,6 +44,7 @@ struct MenuBarView: View {
                     firstTitle: "Waiting",
                     second: .waitingOnYou,
                     secondTitle: "Ghosting",
+                    accentColor: model.accentColor.color,
                     accessibilityLabel: "Conversation type"
                 )
                 .frame(width: 132)
@@ -58,6 +59,7 @@ struct MenuBarView: View {
                     firstTitle: "Likely",
                     second: .all,
                     secondTitle: "All",
+                    accentColor: model.accentColor.color,
                     accessibilityLabel: "Follow-up likelihood"
                 )
                 .frame(width: 90)
@@ -113,6 +115,7 @@ private struct SlidingChoiceToggle<Value: Hashable>: View {
     let firstTitle: String
     let second: Value
     let secondTitle: String
+    let accentColor: Color
     let accessibilityLabel: String
 
     var body: some View {
@@ -131,7 +134,7 @@ private struct SlidingChoiceToggle<Value: Hashable>: View {
                         }
 
                     RoundedRectangle(cornerRadius: 5, style: .continuous)
-                        .fill(Color.accentColor)
+                        .fill(accentColor)
                         .padding(2)
                         .frame(width: proxy.size.width / 2)
                         .shadow(color: .black.opacity(0.10), radius: 0.5, y: 0.5)
