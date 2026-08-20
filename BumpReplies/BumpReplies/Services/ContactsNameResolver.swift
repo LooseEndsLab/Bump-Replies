@@ -37,39 +37,55 @@ struct ContactNameIndex {
     }
 }
 
-@MainActor
 final class ContactsNameResolver {
     private let contactStore = CNContactStore()
+    private let queue = DispatchQueue(label: "com.looseends.bump-replies.contacts", qos: .utility)
     private var index = ContactNameIndex()
     private var hasLoadedContacts = false
     private var namesByIdentifier: [String: String] = [:]
 
     func names(for identifiers: [String]) async -> [String: String] {
-        let unresolved = Set(identifiers).subtracting(namesByIdentifier.keys)
-        guard !unresolved.isEmpty else { return namesByIdentifier }
-        guard await requestAccessIfNeeded() else { return namesByIdentifier }
-
-        loadContactsIfNeeded()
-        for identifier in unresolved {
-            if let name = index.name(for: identifier) {
-                namesByIdentifier[identifier] = name
+        await withCheckedContinuation { continuation in
+            queue.async {
+                self.resolveNames(for: identifiers, continuation: continuation)
             }
         }
-        return namesByIdentifier
     }
 
-    private func requestAccessIfNeeded() async -> Bool {
+    private func resolveNames(for identifiers: [String], continuation: CheckedContinuation<[String: String], Never>) {
+        let unresolved = Set(identifiers).subtracting(namesByIdentifier.keys)
+        guard !unresolved.isEmpty else {
+            continuation.resume(returning: namesByIdentifier)
+            return
+        }
+
         switch CNContactStore.authorizationStatus(for: .contacts) {
         case .authorized:
-            return true
+            loadContactsIfNeeded()
+            cacheNames(for: unresolved)
+            continuation.resume(returning: namesByIdentifier)
         case .notDetermined:
-            return await withCheckedContinuation { continuation in
-                contactStore.requestAccess(for: .contacts) { granted, _ in
-                    continuation.resume(returning: granted)
+            contactStore.requestAccess(for: .contacts) { granted, _ in
+                self.queue.async {
+                    guard granted else {
+                        continuation.resume(returning: self.namesByIdentifier)
+                        return
+                    }
+                    self.loadContactsIfNeeded()
+                    self.cacheNames(for: unresolved)
+                    continuation.resume(returning: self.namesByIdentifier)
                 }
             }
         default:
-            return false
+            continuation.resume(returning: namesByIdentifier)
+        }
+    }
+
+    private func cacheNames(for identifiers: Set<String>) {
+        for identifier in identifiers {
+            if let name = index.name(for: identifier) {
+                namesByIdentifier[identifier] = name
+            }
         }
     }
 

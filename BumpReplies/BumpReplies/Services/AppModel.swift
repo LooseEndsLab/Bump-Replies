@@ -50,12 +50,31 @@ import Combine
             }
         }
     }
-    func dismiss(_ item: FollowUp) { dismissedMessageIDs.insert(item.messageID); save(dismissedMessageIDs, "dismissedMessageIDs"); refresh() }
-    func ignore(_ item: FollowUp) { ignoredChatIDs.insert(item.chatID); save(ignoredChatIDs, "ignoredChatIDs"); refresh() }
+    func dismiss(_ item: FollowUp) {
+        guard dismissedMessageIDs.insert(item.messageID).inserted else { return }
+        save(dismissedMessageIDs, "dismissedMessageIDs")
+        removeFromVisibleConversations(messageID: item.messageID)
+    }
+
+    func ignore(_ item: FollowUp) {
+        guard ignoredChatIDs.insert(item.chatID).inserted else { return }
+        save(ignoredChatIDs, "ignoredChatIDs")
+        removeFromVisibleConversations(chatID: item.chatID)
+    }
     func openInMessages(_ item: FollowUp) { MessagesLauncher.open(chatIdentifier: item.conversation.chatIdentifier) }
     func name(for item: FollowUp) -> String { contactNames[item.conversation.chatIdentifier] ?? item.name }
     func unignore(_ id: Int64) { ignoredChatIDs.remove(id); save(ignoredChatIDs, "ignoredChatIDs"); refresh() }
     var ignoredChats: [Int64] { ignoredChatIDs.sorted() }
+    private func removeFromVisibleConversations(messageID: Int64) {
+        refreshGeneration += 1 // Prevent an in-flight database scan from restoring the row.
+        followUps.removeAll { $0.messageID == messageID }
+        ghostedConversations.removeAll { $0.messageID == messageID }
+    }
+    private func removeFromVisibleConversations(chatID: Int64) {
+        refreshGeneration += 1 // Prevent an in-flight database scan from restoring the row.
+        followUps.removeAll { $0.chatID == chatID }
+        ghostedConversations.removeAll { $0.chatID == chatID }
+    }
     private func refreshNotifications() async { guard notificationsEnabled else { return }; for item in followUps where NotificationDeduplicator.shouldNotify(messageID: item.messageID, notifiedMessageIDs: notifiedMessageIDs) { if await notifier.notifyIfPermitted(for: item) { notifiedMessageIDs.insert(item.messageID); save(notifiedMessageIDs, "notifiedMessageIDs") } } }
     private func save(_ values: Set<Int64>, _ key: String) { defaults.set(Array(values), forKey: key) }
     private func refreshContactNames() async { contactNames = await contactsNameResolver.names(for: (followUps + ghostedConversations).map(\.conversation.chatIdentifier)) }
