@@ -1,3 +1,4 @@
+import AppKit
 import SwiftUI
 
 struct MenuBarView: View {
@@ -37,7 +38,7 @@ struct MenuBarView: View {
         VStack(alignment: .leading, spacing: 0) {
             HStack(spacing: 6) {
                 Text("BumpReplies").font(.headline)
-                SlidingChoiceToggle(
+                NativeChoiceToggle(
                     selection: $selectedTab,
                     first: .waitingOnThem,
                     firstTitle: "Waiting",
@@ -51,7 +52,7 @@ struct MenuBarView: View {
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
 
-                SlidingChoiceToggle(
+                NativeChoiceToggle(
                     selection: $likelihoodFilter,
                     first: .likely,
                     firstTitle: "Likely",
@@ -105,7 +106,7 @@ struct MenuBarView: View {
     }
 }
 
-private struct SlidingChoiceToggle<Value: Hashable>: View {
+private struct NativeChoiceToggle<Value: Hashable>: NSViewRepresentable {
     @Binding var selection: Value
     let first: Value
     let firstTitle: String
@@ -113,45 +114,33 @@ private struct SlidingChoiceToggle<Value: Hashable>: View {
     let secondTitle: String
     let accessibilityLabel: String
 
-    var body: some View {
-        Button {
-            withAnimation(.easeInOut(duration: 0.18)) {
-                selection = selection == first ? second : first
-            }
-        } label: {
-            ZStack(alignment: .leading) {
-                Capsule()
-                    .fill(Color.secondary.opacity(0.13))
-                    .overlay {
-                        Capsule()
-                            .stroke(Color.secondary.opacity(0.24), lineWidth: 1)
-                    }
-
-                GeometryReader { geometry in
-                    Capsule()
-                        .fill(Color.accentColor)
-                        .frame(width: (geometry.size.width - 4) / 2, height: geometry.size.height - 4)
-                        .offset(x: selection == first ? 2 : geometry.size.width / 2)
-                }
-
-                HStack(spacing: 0) {
-                    optionLabel(title: firstTitle, isSelected: selection == first)
-                    optionLabel(title: secondTitle, isSelected: selection == second)
-                }
-            }
-            .contentShape(Capsule())
-        }
-        .buttonStyle(.plain)
-        .frame(height: 28)
-        .animation(.easeInOut(duration: 0.18), value: selection)
-        .accessibilityLabel(accessibilityLabel)
-        .accessibilityValue(selection == first ? firstTitle : secondTitle)
+    func makeNSView(context: Context) -> NSSegmentedControl {
+        let control = NSSegmentedControl(labels: [firstTitle, secondTitle], trackingMode: .selectOne, target: context.coordinator, action: #selector(Coordinator.toggleSelection))
+        control.segmentStyle = .rounded
+        control.controlSize = .small
+        control.setAccessibilityLabel(accessibilityLabel)
+        return control
     }
 
-    private func optionLabel(title: String, isSelected: Bool) -> some View {
-        Text(title)
-            .font(.subheadline.weight(.medium))
-            .foregroundStyle(isSelected ? .white : .primary)
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
+    func updateNSView(_ control: NSSegmentedControl, context: Context) {
+        context.coordinator.parent = self
+        control.selectedSegment = selection == first ? 0 : 1
+        control.setAccessibilityValue(selection == first ? firstTitle : secondTitle)
+    }
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator(parent: self)
+    }
+
+    final class Coordinator: NSObject {
+        var parent: NativeChoiceToggle
+
+        init(parent: NativeChoiceToggle) {
+            self.parent = parent
+        }
+
+        @objc func toggleSelection() {
+            parent.selection = parent.selection == parent.first ? parent.second : parent.first
+        }
     }
 }
