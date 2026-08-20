@@ -37,4 +37,5 @@ Everything stays on your Mac: no backend, networking, telemetry, or analytics. B
 | --- | --- | --- |
 | [#1](https://github.com/LooseEndsLab/Bump-Replies/issues/1) | TODO: publish/package | — |
 | [#2](https://github.com/LooseEndsLab/Bump-Replies/issues/2) | Tune Likely follow-up rules from real-world feedback | — |
+| [#3](https://github.com/LooseEndsLab/Bump-Replies/issues/3) | Add a queue review tab | — |
 <!-- open-issues:end -->
