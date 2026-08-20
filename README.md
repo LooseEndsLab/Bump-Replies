@@ -10,7 +10,20 @@ A private, local-first macOS menu-bar app that spots one-to-one Messages convers
 
 ## Likely follow-ups
 
-Likely is a local priority filter, not a separate definition of a pending chat. BumpReplies first finds each one-to-one chat’s latest non-reaction message, applies the response and age rules, then marks it Likely when that latest message is a question, asks for a decision, or makes a direct request. Messages without those signals remain under **All**. The **Follow up after** setting is the minimum age of that latest message; the maximum-age setting excludes stale conversations.
+BumpReplies uses a small, local algorithm to prioritize conversations that are *likely* to need a reply. It is a helpful ranking, not a separate definition of a pending conversation: every eligible conversation remains available under **All**, while **Likely** surfaces the ones with stronger reply signals first.
+
+First, the app examines the latest non-reaction message in each one-to-one conversation. If that message is yours, the chat can appear in **Waiting**; if it is theirs, it can appear in **Ghosting**. A newer normal reply removes the conversation from the pending side. By default, a newer reaction from the other person is also treated as an acknowledgement. Group chats, dismissed messages, and ignored conversations are excluded according to your settings.
+
+Next, the app applies your age settings. **Follow up after** is the minimum age of the latest message, and **Ignore conversations older than** is the maximum age. For example, with a 7-day follow-up threshold and a 90-day maximum age, a message sent 8 days ago can be included, a message sent 3 days ago cannot, and a message sent 100 days ago is excluded as stale.
+
+For each eligible conversation, the latest message is checked transiently on your Mac for simple reply signals. It is marked **Likely** when it contains a question, a direct request, or a request for a decision. For example:
+
+- “Are you free Thursday?” → likely: asked a question
+- “Can you send me the deck?” or “Please confirm the time.” → likely: made a request
+- “Should we meet next week?” or “Let me know what works.” → likely: asked for a decision or made a request
+- “Sounds good, thanks!” → **Review**, so it stays under **All** but is not prioritized as Likely
+
+This check uses only the latest eligible message and never saves or transmits its text.
 
 ## Run
 
