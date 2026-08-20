@@ -35,10 +35,9 @@ struct MenuBarView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            HStack(spacing: 10) {
+            HStack(spacing: 8) {
                 Text("BumpReplies")
-                    .font(.subheadline.weight(.semibold))
-                    .padding(.trailing, 2)
+                    .font(.headline)
                 SlidingChoiceToggle(
                     selection: $selectedTab,
                     first: .waitingOnThem,
@@ -47,7 +46,7 @@ struct MenuBarView: View {
                     secondTitle: "Ghosting",
                     accessibilityLabel: "Conversation type"
                 )
-                .frame(width: 122)
+                .frame(width: 132)
 
                 Text("Show")
                     .font(.caption)
@@ -61,9 +60,9 @@ struct MenuBarView: View {
                     secondTitle: "All",
                     accessibilityLabel: "Follow-up likelihood"
                 )
-                .frame(width: 86)
+                .frame(width: 90)
             }
-            .padding(.horizontal, 14)
+            .padding(.horizontal, 12)
             .padding(.vertical, 16)
 
             Divider()
@@ -124,14 +123,14 @@ private struct SlidingChoiceToggle<Value: Hashable>: View {
                 let isFirstSelected = selection == first
 
                 ZStack(alignment: isFirstSelected ? .leading : .trailing) {
-                    Capsule(style: .continuous)
+                    RoundedRectangle(cornerRadius: 7, style: .continuous)
                         .fill(Color(nsColor: .controlBackgroundColor))
                         .overlay {
-                            Capsule(style: .continuous)
+                            RoundedRectangle(cornerRadius: 7, style: .continuous)
                                 .stroke(Color(nsColor: .separatorColor).opacity(0.65), lineWidth: 1)
                         }
 
-                    Capsule(style: .continuous)
+                    RoundedRectangle(cornerRadius: 5, style: .continuous)
                         .fill(Color.accentColor)
                         .padding(2)
                         .frame(width: proxy.size.width / 2)
@@ -146,7 +145,7 @@ private struct SlidingChoiceToggle<Value: Hashable>: View {
             }
         }
         .buttonStyle(.plain)
-        .frame(height: 28)
+        .frame(height: 26)
         .accessibilityLabel(accessibilityLabel)
         .accessibilityValue(selection == first ? firstTitle : secondTitle)
         .accessibilityHint("Click to switch to the other option")
@@ -154,8 +153,9 @@ private struct SlidingChoiceToggle<Value: Hashable>: View {
 
     private func choiceLabel(_ title: String, selected: Bool) -> some View {
         Text(title)
-            .font(.subheadline.weight(.medium))
+            .font(.caption.weight(.medium))
             .foregroundStyle(selected ? .white : .primary)
+            .padding(.horizontal, 4)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .contentShape(Rectangle())
             .animation(.easeInOut(duration: 0.12), value: selected)
