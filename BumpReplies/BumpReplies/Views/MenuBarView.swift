@@ -35,9 +35,8 @@ struct MenuBarView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            HStack(spacing: 8) {
+            HStack(spacing: 6) {
                 Text("BumpReplies").font(.headline)
-                Spacer(minLength: 8)
                 Picker("Conversation type", selection: $selectedTab) {
                     ForEach(ConversationTab.allCases) { tab in
                         Text(tab.rawValue).tag(tab)
@@ -45,7 +44,11 @@ struct MenuBarView: View {
                 }
                 .labelsHidden()
                 .pickerStyle(.segmented)
-                .frame(width: 150)
+                .frame(width: 130)
+
+                Text("Show")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
 
                 Picker("Follow-up likelihood", selection: $likelihoodFilter) {
                     ForEach(LikelihoodFilter.allCases) { filter in
@@ -54,7 +57,7 @@ struct MenuBarView: View {
                 }
                 .labelsHidden()
                 .pickerStyle(.segmented)
-                .frame(width: 100)
+                .frame(width: 90)
             }
             .padding()
 
