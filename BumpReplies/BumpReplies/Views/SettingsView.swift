@@ -10,6 +10,22 @@ struct SettingsView: View {
     var body: some View {
         Form {
             Section {
+                Toggle("Only show contacts", isOn: $model.onlyContacts)
+                    .tint(.accentColor)
+                Text("When enabled, BumpReplies only shows conversations whose identifiers match an entry in your local Contacts database.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            } header: {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("BumpReplies Settings")
+                        .font(.title2.weight(.semibold))
+                    Text("Choose which conversations should appear in your follow-up list.")
+                        .foregroundStyle(.secondary)
+                }
+                .textCase(nil)
+            }
+
+            Section("Follow-up filtering") {
                 LabeledContent("Follow up after") {
                     daysField(text: $thresholdDaysText, isFocused: $isThresholdFieldFocused, onSubmit: commitThresholdDays)
                 }
@@ -21,17 +37,6 @@ struct SettingsView: View {
                 Text("Enter a value between \(model.thresholdDays) and 3,650 days. The default is 90 days.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
-            } header: {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("BumpReplies Settings")
-                        .font(.title2.weight(.semibold))
-                    Text("Choose which conversations should appear in your follow-up list.")
-                        .foregroundStyle(.secondary)
-                    Text("Follow-up filtering")
-                        .font(.headline)
-                        .padding(.top, 20)
-                }
-                .textCase(nil)
             }
 
             Section("App behavior") {

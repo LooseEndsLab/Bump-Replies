@@ -22,12 +22,13 @@
 | **Dismiss and ignore** | Remove one message from the queue or hide an entire conversation until you unignore it. |
 | **Notifications** | Optionally receive local notifications for follow-ups. |
 | **Contact names** | Optionally resolve familiar names from your local Contacts database. |
+| **Contacts-only filter** | Shows only conversations that match a local Contact by default; turn it off in Settings to include other identifiers. |
 
 ## How it works
 
 For each one-to-one chat, BumpReplies looks at its latest non-reaction message. If it is yours, the chat can appear in **Waiting**; if it is theirs, it can appear in **Ghosting**—once the message is older than your chosen threshold.
 
-Reactions do not replace the latest message. By default, a newer reaction from the other person is treated as an acknowledgement; you can change that in Settings. Group chats, dismissed messages, and ignored conversations stay out of the queue.
+Reactions do not replace the latest message. By default, a newer reaction from the other person is treated as an acknowledgement; you can change that in Settings. BumpReplies also shows only conversations that match a local Contact by default; turn off **Only show contacts** in Settings to include other identifiers. Group chats, dismissed messages, and ignored conversations stay out of the queue.
 
 ## Likely follow-ups
 
