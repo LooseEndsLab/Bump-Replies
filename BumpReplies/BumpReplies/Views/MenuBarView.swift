@@ -42,7 +42,8 @@ struct MenuBarView: View {
                     first: .waitingOnThem,
                     firstTitle: "Waiting",
                     second: .waitingOnYou,
-                    secondTitle: "Ghosting"
+                    secondTitle: "Ghosting",
+                    accessibilityLabel: "Conversation type"
                 )
                 .frame(width: 130)
 
@@ -55,7 +56,8 @@ struct MenuBarView: View {
                     first: .likely,
                     firstTitle: "Likely",
                     second: .all,
-                    secondTitle: "All"
+                    secondTitle: "All",
+                    accessibilityLabel: "Follow-up likelihood"
                 )
                 .frame(width: 90)
             }
@@ -109,44 +111,43 @@ private struct SlidingChoiceToggle<Value: Hashable>: View {
     let firstTitle: String
     let second: Value
     let secondTitle: String
+    let accessibilityLabel: String
 
     var body: some View {
-        ZStack(alignment: .leading) {
-            Capsule()
-                .fill(Color(nsColor: .controlBackgroundColor))
-
-            GeometryReader { geometry in
-                Capsule()
-                    .fill(Color.accentColor)
-                    .frame(width: (geometry.size.width - 4) / 2, height: geometry.size.height - 4)
-                    .offset(x: selection == first ? 2 : geometry.size.width / 2)
-            }
-            .allowsHitTesting(false)
-
-            HStack(spacing: 0) {
-                optionButton(title: firstTitle, value: first)
-                optionButton(title: secondTitle, value: second)
-            }
-        }
-        .frame(height: 28)
-        .animation(.easeInOut(duration: 0.18), value: selection)
-        .accessibilityElement(children: .contain)
-    }
-
-    private func optionButton(title: String, value: Value) -> some View {
         Button {
             withAnimation(.easeInOut(duration: 0.18)) {
-                selection = value
+                selection = selection == first ? second : first
             }
         } label: {
-            Text(title)
-                .font(.subheadline.weight(.medium))
-                .foregroundStyle(selection == value ? .white : .primary)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .contentShape(Capsule())
+            ZStack(alignment: .leading) {
+                Capsule()
+                    .fill(Color(nsColor: .controlBackgroundColor))
+
+                GeometryReader { geometry in
+                    Capsule()
+                        .fill(Color.accentColor)
+                        .frame(width: (geometry.size.width - 4) / 2, height: geometry.size.height - 4)
+                        .offset(x: selection == first ? 2 : geometry.size.width / 2)
+                }
+
+                HStack(spacing: 0) {
+                    optionLabel(title: firstTitle, isSelected: selection == first)
+                    optionLabel(title: secondTitle, isSelected: selection == second)
+                }
+            }
+            .contentShape(Capsule())
         }
         .buttonStyle(.plain)
-        .accessibilityLabel(title)
-        .accessibilityAddTraits(selection == value ? .isSelected : [])
+        .frame(height: 28)
+        .animation(.easeInOut(duration: 0.18), value: selection)
+        .accessibilityLabel(accessibilityLabel)
+        .accessibilityValue(selection == first ? firstTitle : secondTitle)
+    }
+
+    private func optionLabel(title: String, isSelected: Bool) -> some View {
+        Text(title)
+            .font(.subheadline.weight(.medium))
+            .foregroundStyle(isSelected ? .white : .primary)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }
