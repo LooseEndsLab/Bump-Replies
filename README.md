@@ -4,8 +4,8 @@ A private, local macOS menu-bar app for finding one-to-one Messages chats that m
 
 ## What it does
 
-- **Waiting:** chats where your latest non-reaction message is still awaiting a reply.
-- **Ghosting:** chats where the other person's latest non-reaction message is awaiting you.
+- **Bump:** chats where your latest non-reaction message may need a follow-up.
+- **Respond:** chats where the other person's latest non-reaction message is awaiting you.
 - **Suggested:** prioritizes questions and requests; **All** includes every eligible chat.
 - Dismiss a message or ignore a conversation to keep the queue tidy.
 

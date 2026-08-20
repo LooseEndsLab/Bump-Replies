@@ -81,7 +81,7 @@ struct SettingsView: View {
 
                 likelihoodExplanation(
                     title: "2. Apply the response rule",
-                    detail: "Your latest message appears in Waiting; their latest message appears in Ghosting. When “Treat reactions as replies” is on, a newer reaction from the other person also counts as an acknowledgement."
+                    detail: "Your latest message appears in Bump; their latest message appears in Respond. When “Treat reactions as replies” is on, a newer reaction from the other person also counts as an acknowledgement."
                 )
 
                 likelihoodExplanation(

@@ -2,7 +2,7 @@ import Foundation
 
 /// A local, deterministic assessment of whether the sender's latest message
 /// likely calls for a reply. It intentionally uses the same rules regardless
-/// of who sent the message, so Waiting and Ghosting stay symmetric.
+/// of who sent the message, so Bump and Respond stay symmetric.
 enum FollowUpLikelihood: Equatable {
     case likely(reason: String)
     case review

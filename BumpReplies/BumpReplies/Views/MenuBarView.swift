@@ -2,8 +2,8 @@ import SwiftUI
 
 struct MenuBarView: View {
     private enum ConversationTab: String, CaseIterable, Identifiable {
-        case waitingOnThem = "Waiting"
-        case waitingOnYou = "Ghosting"
+        case waitingOnThem = "Bump"
+        case waitingOnYou = "Respond"
 
         var id: Self { self }
     }
@@ -41,9 +41,9 @@ struct MenuBarView: View {
                 SlidingChoiceToggle(
                     selection: $selectedTab,
                     first: .waitingOnThem,
-                    firstTitle: "Waiting",
+                    firstTitle: "Bump",
                     second: .waitingOnYou,
-                    secondTitle: "Ghosting",
+                    secondTitle: "Respond",
                     accentColor: model.accentColor.color,
                     accessibilityLabel: "Conversation type"
                 )
@@ -93,7 +93,7 @@ struct MenuBarView: View {
         } else if conversations.isEmpty {
             VStack(spacing: 6) {
                 Image(systemName: "checkmark.circle").font(.title2).foregroundStyle(.secondary)
-                Text(likelihoodFilter == .likely ? "No suggested follow-ups" : (selectedTab == .waitingOnThem ? "No conversations waiting" : "No unanswered conversations"))
+                Text(likelihoodFilter == .likely ? "No suggested follow-ups" : (selectedTab == .waitingOnThem ? "No follow-ups to bump" : "No responses due"))
                 Text(likelihoodFilter == .likely ? "Use All to review every eligible conversation." : (selectedTab == .waitingOnThem ? "You’re all caught up." : "No one is waiting on your reply.")).font(.caption).foregroundStyle(.secondary)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
