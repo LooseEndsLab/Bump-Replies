@@ -35,7 +35,7 @@ struct MenuBarView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            HStack(spacing: 14) {
+            HStack(spacing: 10) {
                 Text("BumpReplies")
                     .font(.headline)
                 SlidingChoiceToggle(
@@ -62,7 +62,7 @@ struct MenuBarView: View {
                     accentColor: model.accentColor.color,
                     accessibilityLabel: "Follow-up likelihood"
                 )
-                .frame(width: 90)
+                .frame(width: 124)
             }
             .padding(.horizontal, 12)
             .padding(.vertical, 16)
@@ -83,7 +83,7 @@ struct MenuBarView: View {
             }
             .padding()
         }
-        .frame(width: 420, height: 420)
+        .frame(width: 460, height: 420)
         .background(Color(nsColor: .windowBackgroundColor))
     }
 
@@ -157,8 +157,8 @@ private struct SlidingChoiceToggle<Value: Hashable>: View {
     private func choiceLabel(_ title: String, selected: Bool) -> some View {
         Text(title)
             .font(.caption.weight(.medium))
+            .lineLimit(1)
             .foregroundStyle(selected ? .white : .primary)
-            .padding(.horizontal, 4)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .contentShape(Rectangle())
             .animation(.easeInOut(duration: 0.12), value: selected)
