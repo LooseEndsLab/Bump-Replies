@@ -62,7 +62,7 @@ struct MenuBarView: View {
                     accentColor: model.accentColor.color,
                     accessibilityLabel: "Follow-up likelihood"
                 )
-                .frame(width: 124)
+                .frame(width: 136)
             }
             .padding(.horizontal, 12)
             .padding(.vertical, 16)
