@@ -36,6 +36,7 @@ struct MenuBarView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             HStack(spacing: 0) {
+                Spacer(minLength: 12)
                 Text("Spark")
                     .font(.headline)
                 Spacer(minLength: 12)
@@ -66,6 +67,7 @@ struct MenuBarView: View {
                     accessibilityLabel: "Follow-up likelihood"
                 )
                 .frame(width: 136)
+                Spacer(minLength: 12)
             }
             .padding(.horizontal, 12)
             .padding(.vertical, 16)
