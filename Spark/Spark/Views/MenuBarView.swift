@@ -35,9 +35,10 @@ struct MenuBarView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            HStack(spacing: 10) {
+            HStack(spacing: 0) {
                 Text("Spark")
                     .font(.headline)
+                Spacer(minLength: 12)
                 SlidingChoiceToggle(
                     selection: $selectedTab,
                     first: .waitingOnThem,
@@ -49,10 +50,12 @@ struct MenuBarView: View {
                 )
                 .frame(width: 132)
 
+                Spacer(minLength: 12)
                 Text("Show")
                     .font(.caption)
                     .foregroundStyle(.secondary)
 
+                Spacer(minLength: 12)
                 SlidingChoiceToggle(
                     selection: $likelihoodFilter,
                     first: .likely,
