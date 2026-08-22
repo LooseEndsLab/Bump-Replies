@@ -99,7 +99,7 @@ struct MenuBarView: View {
             VStack(spacing: 6) {
                 Image(systemName: "checkmark.circle").font(.title2).foregroundStyle(.secondary)
                 Text(likelihoodFilter == .likely ? "No suggested follow-ups" : (selectedTab == .waitingOnThem ? "No follow-ups waiting" : "No responses due"))
-                Text(likelihoodFilter == .likely ? "Use All to review every eligible conversation." : (selectedTab == .waitingOnThem ? "You’re all caught up." : "No one is waiting on your reply.")).font(.caption).foregroundStyle(.secondary)
+                Text(likelihoodFilter == .likely ? "Use \"All\" to review every eligible conversation." : (selectedTab == .waitingOnThem ? "You’re all caught up." : "No one is waiting on your reply.")).font(.caption).foregroundStyle(.secondary)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else {
