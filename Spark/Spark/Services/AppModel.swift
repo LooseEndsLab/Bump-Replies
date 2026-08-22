@@ -63,6 +63,13 @@ import Combine
         removeFromVisibleConversations(messageID: item.messageID)
     }
 
+    func resetDismissedConversations() {
+        guard !dismissedMessageIDs.isEmpty else { return }
+        dismissedMessageIDs.removeAll()
+        save(dismissedMessageIDs, "dismissedMessageIDs")
+        refresh()
+    }
+
     func ignore(_ item: FollowUp) {
         guard ignoredChatIDs.insert(item.chatID).inserted else { return }
         save(ignoredChatIDs, "ignoredChatIDs")
@@ -72,6 +79,7 @@ import Combine
     func name(for item: FollowUp) -> String { contactNames[item.conversation.chatIdentifier] ?? item.name }
     func unignore(_ id: Int64) { ignoredChatIDs.remove(id); save(ignoredChatIDs, "ignoredChatIDs"); refresh() }
     var ignoredChats: [Int64] { ignoredChatIDs.sorted() }
+    var hasDismissedConversations: Bool { !dismissedMessageIDs.isEmpty }
     private func removeFromVisibleConversations(messageID: Int64) {
         refreshGeneration += 1 // Prevent an in-flight database scan from restoring the row.
         followUps.removeAll { $0.messageID == messageID }

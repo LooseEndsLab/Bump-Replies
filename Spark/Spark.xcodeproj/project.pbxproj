@@ -12,37 +12,37 @@
 			containerPortal = A2754C5A3037948600EF0479 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = A2754C613037948600EF0479;
-			remoteInfo = BumpReplies;
+			remoteInfo = Spark;
 		};
 		A2754C7A3037948800EF0479 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = A2754C5A3037948600EF0479 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = A2754C613037948600EF0479;
-			remoteInfo = BumpReplies;
+			remoteInfo = Spark;
 		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		A2754C623037948600EF0479 /* BumpReplies.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BumpReplies.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		A2754C6F3037948800EF0479 /* BumpRepliesTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BumpRepliesTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		A2754C793037948800EF0479 /* BumpRepliesUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BumpRepliesUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		A2754C623037948600EF0479 /* Spark.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Spark.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A2754C6F3037948800EF0479 /* SparkTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SparkTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		A2754C793037948800EF0479 /* SparkUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SparkUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		A2754C643037948600EF0479 /* BumpReplies */ = {
+		A2754C643037948600EF0479 /* Spark */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = BumpReplies;
+			path = Spark;
 			sourceTree = "<group>";
 		};
-		A2754C723037948800EF0479 /* BumpRepliesTests */ = {
+		A2754C723037948800EF0479 /* SparkTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = BumpRepliesTests;
+			path = SparkTests;
 			sourceTree = "<group>";
 		};
-		A2754C7C3037948800EF0479 /* BumpRepliesUITests */ = {
+		A2754C7C3037948800EF0479 /* SparkUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = BumpRepliesUITests;
+			path = SparkUITests;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -75,9 +75,9 @@
 		A2754C593037948600EF0479 = {
 			isa = PBXGroup;
 			children = (
-				A2754C643037948600EF0479 /* BumpReplies */,
-				A2754C723037948800EF0479 /* BumpRepliesTests */,
-				A2754C7C3037948800EF0479 /* BumpRepliesUITests */,
+				A2754C643037948600EF0479 /* Spark */,
+				A2754C723037948800EF0479 /* SparkTests */,
+				A2754C7C3037948800EF0479 /* SparkUITests */,
 				A2754C633037948600EF0479 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -85,9 +85,9 @@
 		A2754C633037948600EF0479 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				A2754C623037948600EF0479 /* BumpReplies.app */,
-				A2754C6F3037948800EF0479 /* BumpRepliesTests.xctest */,
-				A2754C793037948800EF0479 /* BumpRepliesUITests.xctest */,
+				A2754C623037948600EF0479 /* Spark.app */,
+				A2754C6F3037948800EF0479 /* SparkTests.xctest */,
+				A2754C793037948800EF0479 /* SparkUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -95,9 +95,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		A2754C613037948600EF0479 /* BumpReplies */ = {
+		A2754C613037948600EF0479 /* Spark */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = A2754C833037948800EF0479 /* Build configuration list for PBXNativeTarget "BumpReplies" */;
+			buildConfigurationList = A2754C833037948800EF0479 /* Build configuration list for PBXNativeTarget "Spark" */;
 			buildPhases = (
 				A2754C5E3037948600EF0479 /* Sources */,
 				A2754C5F3037948600EF0479 /* Frameworks */,
@@ -108,18 +108,18 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				A2754C643037948600EF0479 /* BumpReplies */,
+				A2754C643037948600EF0479 /* Spark */,
 			);
-			name = BumpReplies;
+			name = Spark;
 			packageProductDependencies = (
 			);
-			productName = BumpReplies;
-			productReference = A2754C623037948600EF0479 /* BumpReplies.app */;
+			productName = Spark;
+			productReference = A2754C623037948600EF0479 /* Spark.app */;
 			productType = "com.apple.product-type.application";
 		};
-		A2754C6E3037948800EF0479 /* BumpRepliesTests */ = {
+		A2754C6E3037948800EF0479 /* SparkTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = A2754C863037948800EF0479 /* Build configuration list for PBXNativeTarget "BumpRepliesTests" */;
+			buildConfigurationList = A2754C863037948800EF0479 /* Build configuration list for PBXNativeTarget "SparkTests" */;
 			buildPhases = (
 				A2754C6B3037948800EF0479 /* Sources */,
 				A2754C6C3037948800EF0479 /* Frameworks */,
@@ -131,18 +131,18 @@
 				A2754C713037948800EF0479 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				A2754C723037948800EF0479 /* BumpRepliesTests */,
+				A2754C723037948800EF0479 /* SparkTests */,
 			);
-			name = BumpRepliesTests;
+			name = SparkTests;
 			packageProductDependencies = (
 			);
-			productName = BumpRepliesTests;
-			productReference = A2754C6F3037948800EF0479 /* BumpRepliesTests.xctest */;
+			productName = SparkTests;
+			productReference = A2754C6F3037948800EF0479 /* SparkTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		A2754C783037948800EF0479 /* BumpRepliesUITests */ = {
+		A2754C783037948800EF0479 /* SparkUITests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = A2754C893037948800EF0479 /* Build configuration list for PBXNativeTarget "BumpRepliesUITests" */;
+			buildConfigurationList = A2754C893037948800EF0479 /* Build configuration list for PBXNativeTarget "SparkUITests" */;
 			buildPhases = (
 				A2754C753037948800EF0479 /* Sources */,
 				A2754C763037948800EF0479 /* Frameworks */,
@@ -154,13 +154,13 @@
 				A2754C7B3037948800EF0479 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				A2754C7C3037948800EF0479 /* BumpRepliesUITests */,
+				A2754C7C3037948800EF0479 /* SparkUITests */,
 			);
-			name = BumpRepliesUITests;
+			name = SparkUITests;
 			packageProductDependencies = (
 			);
-			productName = BumpRepliesUITests;
-			productReference = A2754C793037948800EF0479 /* BumpRepliesUITests.xctest */;
+			productName = SparkUITests;
+			productReference = A2754C793037948800EF0479 /* SparkUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 /* End PBXNativeTarget section */
@@ -186,7 +186,7 @@
 					};
 				};
 			};
-			buildConfigurationList = A2754C5D3037948600EF0479 /* Build configuration list for PBXProject "BumpReplies" */;
+			buildConfigurationList = A2754C5D3037948600EF0479 /* Build configuration list for PBXProject "Spark" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -200,9 +200,9 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				A2754C613037948600EF0479 /* BumpReplies */,
-				A2754C6E3037948800EF0479 /* BumpRepliesTests */,
-				A2754C783037948800EF0479 /* BumpRepliesUITests */,
+				A2754C613037948600EF0479 /* Spark */,
+				A2754C6E3037948800EF0479 /* SparkTests */,
+				A2754C783037948800EF0479 /* SparkUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -258,12 +258,12 @@
 /* Begin PBXTargetDependency section */
 		A2754C713037948800EF0479 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = A2754C613037948600EF0479 /* BumpReplies */;
+			target = A2754C613037948600EF0479 /* Spark */;
 			targetProxy = A2754C703037948800EF0479 /* PBXContainerItemProxy */;
 		};
 		A2754C7B3037948800EF0479 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = A2754C613037948600EF0479 /* BumpReplies */;
+			target = A2754C613037948600EF0479 /* Spark */;
 			targetProxy = A2754C7A3037948800EF0479 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -401,7 +401,7 @@
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_LSUIElement = YES;
-				INFOPLIST_KEY_NSContactsUsageDescription = "BumpReplies uses your local Contacts only to show names for waiting conversations.";
+				INFOPLIST_KEY_NSContactsUsageDescription = "Spark uses your local Contacts only to show names for waiting conversations.";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -438,7 +438,7 @@
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_LSUIElement = YES;
-				INFOPLIST_KEY_NSContactsUsageDescription = "BumpReplies uses your local Contacts only to show names for waiting conversations.";
+				INFOPLIST_KEY_NSContactsUsageDescription = "Spark uses your local Contacts only to show names for waiting conversations.";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -477,7 +477,7 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/BumpReplies.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/BumpReplies";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Spark.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Spark";
 			};
 			name = Debug;
 		};
@@ -497,7 +497,7 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/BumpReplies.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/BumpReplies";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Spark.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Spark";
 			};
 			name = Release;
 		};
@@ -515,7 +515,7 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
-				TEST_TARGET_NAME = BumpReplies;
+				TEST_TARGET_NAME = Spark;
 			};
 			name = Debug;
 		};
@@ -533,14 +533,14 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
-				TEST_TARGET_NAME = BumpReplies;
+				TEST_TARGET_NAME = Spark;
 			};
 			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		A2754C5D3037948600EF0479 /* Build configuration list for PBXProject "BumpReplies" */ = {
+		A2754C5D3037948600EF0479 /* Build configuration list for PBXProject "Spark" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				A2754C813037948800EF0479 /* Debug */,
@@ -549,7 +549,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		A2754C833037948800EF0479 /* Build configuration list for PBXNativeTarget "BumpReplies" */ = {
+		A2754C833037948800EF0479 /* Build configuration list for PBXNativeTarget "Spark" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				A2754C843037948800EF0479 /* Debug */,
@@ -558,7 +558,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		A2754C863037948800EF0479 /* Build configuration list for PBXNativeTarget "BumpRepliesTests" */ = {
+		A2754C863037948800EF0479 /* Build configuration list for PBXNativeTarget "SparkTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				A2754C873037948800EF0479 /* Debug */,
@@ -567,7 +567,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		A2754C893037948800EF0479 /* Build configuration list for PBXNativeTarget "BumpRepliesUITests" */ = {
+		A2754C893037948800EF0479 /* Build configuration list for PBXNativeTarget "SparkUITests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				A2754C8A3037948800EF0479 /* Debug */,

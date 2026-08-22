@@ -1,8 +1,8 @@
-# BumpReplies contributor guide
+# Spark contributor guide
 
 ## Scope
 
-BumpReplies is a local-only macOS menu-bar app. It identifies one-to-one Messages conversations that may need a follow-up.
+Spark is a local-only macOS menu-bar app. It identifies one-to-one Messages conversations that may need a follow-up.
 
 ## Privacy and data rules
 
@@ -32,10 +32,10 @@ Run unit tests only unless UI testing is specifically requested:
 
 ```sh
 xcodebuild test \
-  -project BumpReplies/BumpReplies.xcodeproj \
-  -scheme BumpReplies \
+  -project Spark/Spark.xcodeproj \
+  -scheme Spark \
   -destination 'platform=macOS,arch=arm64' \
-  -only-testing:BumpRepliesTests
+  -only-testing:SparkTests
 ```
 
 Use a temporary DerivedData path if an existing local build has stale nested test signatures. Do not clean or alter the user’s active app build merely to run tests.

@@ -1,6 +1,6 @@
 //
-//  BumpRepliesApp.swift
-//  BumpReplies
+//  SparkApp.swift
+//  Spark
 //
 //  Created by Aryan Mehra on 8/20/26.
 //
@@ -8,11 +8,11 @@
 import SwiftUI
 
 @main
-struct BumpRepliesApp: App {
+struct SparkApp: App {
     @StateObject private var model = AppModel()
 
     var body: some Scene {
-        MenuBarExtra("BumpReplies", systemImage: "arrowshape.turn.up.left.circle") {
+        MenuBarExtra("Spark", systemImage: "arrowshape.turn.up.left.circle") {
             MenuBarView()
                 .environmentObject(model)
                 .tint(model.accentColor.color)

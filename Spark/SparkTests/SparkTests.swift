@@ -1,6 +1,6 @@
 //
-//  BumpRepliesTests.swift
-//  BumpRepliesTests
+//  SparkTests.swift
+//  SparkTests
 //
 //  Created by Aryan Mehra on 8/20/26.
 //
@@ -8,9 +8,9 @@
 import Testing
 import Foundation
 import SQLite3
-@testable import BumpReplies
+@testable import Spark
 
-struct BumpRepliesTests {
+struct SparkTests {
 
     private let now = Date(timeIntervalSinceReferenceDate: 800_000_000)
     private func message(daysAgo: Int, fromMe: Bool = true, chatID: Int64 = 1, messageID: Int64 = 10, text: String? = nil, hasReactionResponse: Bool = false) -> ConversationMessage { ConversationMessage(chatID: chatID, chatIdentifier: "test", displayName: "Test", messageID: messageID, date: Calendar.current.date(byAdding: .day, value: -daysAgo, to: now)!, isFromMe: fromMe, isGroupChat: false, hasOppositeDirectionReactionAfterMessage: hasReactionResponse, likelihood: FollowUpLikelihood.classify(messageText: text)) }
@@ -195,7 +195,7 @@ private func latestMessagesFromTestDatabase(_ messages: [(date: Int64, isFromMe:
 }
 
 private func latestMessagesFromTestDatabase(_ messages: [(date: Int64, isFromMe: Bool, associatedMessageType: Int64)]) throws -> [ConversationMessage] {
-    let databaseURL = FileManager.default.temporaryDirectory.appending(path: "BumpRepliesTests-\(UUID().uuidString).sqlite")
+    let databaseURL = FileManager.default.temporaryDirectory.appending(path: "SparkTests-\(UUID().uuidString).sqlite")
     defer { try? FileManager.default.removeItem(at: databaseURL) }
 
     var database: OpaquePointer?

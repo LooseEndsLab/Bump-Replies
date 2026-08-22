@@ -7,7 +7,7 @@ final class NotificationManager: FollowUpNotifying {
     func notifyIfPermitted(for followUp: FollowUp) async -> Bool {
         let settings = await UNUserNotificationCenter.current().notificationSettings()
         guard settings.authorizationStatus == .authorized || settings.authorizationStatus == .provisional else { return false }
-        let content = UNMutableNotificationContent(); content.title = "BumpReplies"; content.body = "\(followUp.name) has been waiting \(followUp.daysOld()) days for a reply."; content.sound = .default
-        do { try await UNUserNotificationCenter.current().add(UNNotificationRequest(identifier: "BumpReplies.\(followUp.messageID)", content: content, trigger: nil)); return true } catch { return false }
+        let content = UNMutableNotificationContent(); content.title = "Spark"; content.body = "\(followUp.name) has been waiting \(followUp.daysOld()) days for a reply."; content.sound = .default
+        do { try await UNUserNotificationCenter.current().add(UNNotificationRequest(identifier: "Spark.\(followUp.messageID)", content: content, trigger: nil)); return true } catch { return false }
     }
 }

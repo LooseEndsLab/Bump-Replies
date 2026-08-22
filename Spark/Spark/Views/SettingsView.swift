@@ -11,19 +11,20 @@ struct SettingsView: View {
         Form {
             Section {
                 Toggle("Only show contacts", isOn: $model.onlyContacts)
-                    .tint(.accentColor)
-                Text("When enabled, BumpReplies only shows conversations whose identifiers match an entry in your local Contacts database.")
+                    .toggleStyle(SwitchToggleStyle(tint: .blue))
+                Text("When enabled, Spark only shows conversations whose identifiers match an entry in your local Contacts database.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             } header: {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("BumpReplies Settings")
+                    Text("Spark Settings")
                         .font(.title2.weight(.semibold))
                     Text("Choose which conversations should appear in your follow-up list.")
                         .foregroundStyle(.secondary)
                 }
                 .textCase(nil)
             }
+
             Section("Appearance") {
                 Picker("Accent color", selection: $model.accentColor) {
                     ForEach(AppAccent.allCases) { accent in
@@ -32,14 +33,17 @@ struct SettingsView: View {
                 }
             }
 
-
             Section("Follow-up filtering") {
-                LabeledContent("Follow up after") {
+                LabeledContent {
                     daysField(text: $thresholdDaysText, isFocused: $isThresholdFieldFocused, onSubmit: commitThresholdDays)
+                } label: {
+                    focusableSettingLabel("Follow up after") { isThresholdFieldFocused = true }
                 }
 
-                LabeledContent("Ignore conversations older than") {
+                LabeledContent {
                     daysField(text: $maximumAgeDaysText, isFocused: $isMaximumAgeFieldFocused, onSubmit: commitMaximumAgeDays)
+                } label: {
+                    focusableSettingLabel("Ignore conversations older than") { isMaximumAgeFieldFocused = true }
                 }
 
                 Text("Enter a value between \(model.thresholdDays) and 3,650 days. The default is 90 days.")
@@ -49,13 +53,13 @@ struct SettingsView: View {
 
             Section("App behavior") {
                 Toggle("Notifications", isOn: $model.notificationsEnabled)
-                    .tint(.accentColor)
+                    .toggleStyle(SwitchToggleStyle(tint: .blue))
                 Toggle("Ignore group chats", isOn: $model.ignoreGroupChats)
-                    .tint(.accentColor)
+                    .toggleStyle(SwitchToggleStyle(tint: .blue))
                 Toggle("Treat reactions as replies", isOn: $model.treatReactionsAsReplies)
-                    .tint(.accentColor)
+                    .toggleStyle(SwitchToggleStyle(tint: .blue))
                 Toggle("Launch at Login", isOn: $model.launchAtLogin)
-                    .tint(.accentColor)
+                    .toggleStyle(SwitchToggleStyle(tint: .blue))
             }
 
             Section("Ignored Conversations") {
@@ -73,15 +77,25 @@ struct SettingsView: View {
                 }
             }
 
+            Section("Dismissed Conversations") {
+                Text("Resetting restores any conversation hidden with Dismiss that still meets your follow-up criteria.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                Button("Reset Dismissed Conversations") {
+                    model.resetDismissedConversations()
+                }
+                .disabled(!model.hasDismissedConversations)
+            }
+
             Section("How “Suggested” is calculated") {
                 likelihoodExplanation(
                     title: "1. Find the latest conversation message",
-                    detail: "For each one-to-one chat, BumpReplies finds the latest non-reaction message overall before checking who sent it. A newer normal reply means the chat is not pending."
+                    detail: "For each one-to-one chat, Spark finds the latest non-reaction message overall before checking who sent it. A newer normal reply means the chat is not pending."
                 )
 
                 likelihoodExplanation(
                     title: "2. Apply the response rule",
-                    detail: "Your latest message appears in Bump; their latest message appears in Respond. When “Treat reactions as replies” is on, a newer reaction from the other person also counts as an acknowledgement."
+                    detail: "Your latest message appears in Follow Up; their latest message appears in Respond. When “Treat reactions as replies” is on, a newer reaction from the other person also counts as an acknowledgement."
                 )
 
                 likelihoodExplanation(
@@ -128,6 +142,15 @@ struct SettingsView: View {
             Text("days")
                 .foregroundStyle(.secondary)
         }
+    }
+
+    private func focusableSettingLabel(_ title: String, focus: @escaping () -> Void) -> some View {
+        Button(action: focus) {
+            Text(title)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
     }
 
     private func likelihoodExplanation(title: String, detail: String) -> some View {

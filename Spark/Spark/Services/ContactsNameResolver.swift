@@ -39,7 +39,7 @@ struct ContactNameIndex {
 
 final class ContactsNameResolver {
     private let contactStore = CNContactStore()
-    private let queue = DispatchQueue(label: "com.looseends.bump-replies.contacts", qos: .utility)
+    private let queue = DispatchQueue(label: "com.looseends.spark.contacts", qos: .utility)
     private var index = ContactNameIndex()
     private var hasLoadedContacts = false
     private var namesByIdentifier: [String: String] = [:]

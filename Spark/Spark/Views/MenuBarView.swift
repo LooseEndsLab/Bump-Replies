@@ -2,7 +2,7 @@ import SwiftUI
 
 struct MenuBarView: View {
     private enum ConversationTab: String, CaseIterable, Identifiable {
-        case waitingOnThem = "Bump"
+        case waitingOnThem = "Follow Up"
         case waitingOnYou = "Respond"
 
         var id: Self { self }
@@ -36,12 +36,12 @@ struct MenuBarView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             HStack(spacing: 10) {
-                Text("BumpReplies")
+                Text("Spark")
                     .font(.headline)
                 SlidingChoiceToggle(
                     selection: $selectedTab,
                     first: .waitingOnThem,
-                    firstTitle: "Bump",
+                    firstTitle: "Follow Up",
                     second: .waitingOnYou,
                     secondTitle: "Respond",
                     accentColor: model.accentColor.color,
@@ -93,7 +93,7 @@ struct MenuBarView: View {
         } else if conversations.isEmpty {
             VStack(spacing: 6) {
                 Image(systemName: "checkmark.circle").font(.title2).foregroundStyle(.secondary)
-                Text(likelihoodFilter == .likely ? "No suggested follow-ups" : (selectedTab == .waitingOnThem ? "No follow-ups to bump" : "No responses due"))
+                Text(likelihoodFilter == .likely ? "No suggested follow-ups" : (selectedTab == .waitingOnThem ? "No follow-ups waiting" : "No responses due"))
                 Text(likelihoodFilter == .likely ? "Use All to review every eligible conversation." : (selectedTab == .waitingOnThem ? "You’re all caught up." : "No one is waiting on your reply.")).font(.caption).foregroundStyle(.secondary)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)

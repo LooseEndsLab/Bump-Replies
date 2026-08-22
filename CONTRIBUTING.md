@@ -8,10 +8,10 @@ Build and run unit tests before submitting changes:
 
 ```sh
 xcodebuild test \
-  -project BumpReplies/BumpReplies.xcodeproj \
-  -scheme BumpReplies \
+  -project Spark/Spark.xcodeproj \
+  -scheme Spark \
   -destination 'platform=macOS,arch=arm64' \
-  -only-testing:BumpRepliesTests
+  -only-testing:SparkTests
 ```
 
 Do not change the app bundle identifier or signing configuration unless the work explicitly calls for it.

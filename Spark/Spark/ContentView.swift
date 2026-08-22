@@ -1,6 +1,6 @@
 //
 //  ContentView.swift
-//  BumpReplies
+//  Spark
 //
 //  Created by Aryan Mehra on 8/20/26.
 //

@@ -1,13 +1,13 @@
 //
-//  BumpRepliesUITestsLaunchTests.swift
-//  BumpRepliesUITests
+//  SparkUITestsLaunchTests.swift
+//  SparkUITests
 //
 //  Created by Aryan Mehra on 8/20/26.
 //
 
 import XCTest
 
-final class BumpRepliesUITestsLaunchTests: XCTestCase {
+final class SparkUITestsLaunchTests: XCTestCase {
 
     override func setUpWithError() throws {
         continueAfterFailure = false
